@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
+import { Navbar } from "@/components/layout/Navbar";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Card } from "@/components/ui/card";
@@ -102,22 +103,10 @@ const Profile = () => {
     }
   };
 
-  const handleLogout = async () => {
-    await supabase.auth.signOut();
-    toast.success("Logged out successfully");
-    navigate("/");
-  };
-
   if (loading) {
     return (
       <div className="min-h-screen bg-background">
-        <header className="border-b border-border">
-          <div className="container mx-auto px-4 py-4 flex justify-between items-center">
-            <h1 className="text-2xl font-bold text-primary cursor-pointer" onClick={() => navigate("/")}>
-              Zine
-            </h1>
-          </div>
-        </header>
+        <Navbar />
         <main className="container mx-auto px-4 py-8">
           <div className="max-w-4xl mx-auto space-y-6">
             <Skeleton className="h-32 w-full" />
@@ -141,27 +130,7 @@ const Profile = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Header */}
-      <header className="border-b border-border">
-        <div className="container mx-auto px-4 py-4 flex justify-between items-center">
-          <h1 className="text-2xl font-bold text-primary cursor-pointer" onClick={() => navigate("/")}>
-            Zine
-          </h1>
-          <div className="flex items-center gap-3">
-            <Button variant="ghost" onClick={() => navigate("/feed")}>
-              Feed
-            </Button>
-            <Button variant="ghost" onClick={() => navigate("/explore")}>
-              Explore
-            </Button>
-            {user && (
-              <Button variant="outline" onClick={handleLogout}>
-                Log Out
-              </Button>
-            )}
-          </div>
-        </div>
-      </header>
+      <Navbar />
 
       <main className="container mx-auto px-4 py-8">
         <div className="max-w-4xl mx-auto">

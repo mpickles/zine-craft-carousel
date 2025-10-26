@@ -1,32 +1,13 @@
-import { useAuth } from "@/contexts/AuthContext";
+import { Navbar } from "@/components/layout/Navbar";
 import { Button } from "@/components/ui/button";
-import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
-import { toast } from "sonner";
 
 const Feed = () => {
-  const { user } = useAuth();
   const navigate = useNavigate();
-
-  const handleLogout = async () => {
-    await supabase.auth.signOut();
-    toast.success("Logged out successfully");
-    navigate("/");
-  };
 
   return (
     <div className="min-h-screen bg-background">
-      <header className="border-b border-border">
-        <div className="container mx-auto px-4 py-4 flex justify-between items-center">
-          <h1 className="text-2xl font-bold text-primary">Zine</h1>
-          <div className="flex items-center gap-4">
-            <span className="text-sm text-muted-foreground">{user?.email}</span>
-            <Button variant="outline" onClick={handleLogout}>
-              Log Out
-            </Button>
-          </div>
-        </div>
-      </header>
+      <Navbar />
 
       <main className="container mx-auto px-4 py-8">
         <div className="max-w-2xl mx-auto">
@@ -35,7 +16,7 @@ const Feed = () => {
             <p className="text-muted-foreground mb-4">
               Your feed is empty. Start following creators to see their posts here.
             </p>
-            <Button>Explore</Button>
+            <Button onClick={() => navigate("/explore")}>Explore</Button>
           </div>
         </div>
       </main>
