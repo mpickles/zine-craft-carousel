@@ -19,12 +19,20 @@ const Signup = () => {
     setLoading(true);
 
     try {
+      // Validate username format
+      const usernameRegex = /^[a-z0-9_]{3,20}$/;
+      if (!usernameRegex.test(username.toLowerCase())) {
+        toast.error("Username must be 3-20 characters: lowercase letters, numbers, and underscores only");
+        setLoading(false);
+        return;
+      }
+
       // Check reserved usernames
       const { data: reserved } = await supabase
         .from("reserved_usernames")
         .select("username")
         .eq("username", username.toLowerCase())
-        .single();
+        .maybeSingle();
 
       if (reserved) {
         toast.error("This username is reserved");
@@ -37,7 +45,7 @@ const Signup = () => {
         .from("profiles")
         .select("username")
         .eq("username", username.toLowerCase())
-        .single();
+        .maybeSingle();
 
       if (existingUser) {
         toast.error("Username is already taken");
@@ -45,9 +53,9 @@ const Signup = () => {
         return;
       }
 
-      const redirectUrl = `${window.location.origin}/`;
+      const redirectUrl = `${window.location.origin}/feed`;
 
-      const { error } = await supabase.auth.signUp({
+      const { data, error } = await supabase.auth.signUp({
         email,
         password,
         options: {
@@ -60,16 +68,19 @@ const Signup = () => {
 
       if (error) throw error;
 
-      // Update profile with username
-      const { data: { user } } = await supabase.auth.getUser();
-      if (user) {
-        await supabase
+      // Update profile with username after signup
+      if (data.user) {
+        const { error: updateError } = await supabase
           .from("profiles")
           .update({ username: username.toLowerCase() })
-          .eq("id", user.id);
+          .eq("id", data.user.id);
+
+        if (updateError) {
+          console.error("Error updating profile:", updateError);
+        }
       }
 
-      toast.success("Account created! Please check your email to verify.");
+      toast.success("Account created! Check your email to verify, then log in.");
       navigate("/login");
     } catch (error: any) {
       toast.error(error.message || "Failed to sign up");
