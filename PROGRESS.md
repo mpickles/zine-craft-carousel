@@ -218,23 +218,37 @@ All tables created with Row Level Security (RLS) policies:
 
 ---
 
+## ✅ Completed (Phase 2: Post Creation)
+
+**Status: FULLY WORKING ✅**
+
+### Post Creation
+- ✅ Create post page (`/create`)
+- ✅ Image upload component (drag-drop, file picker)
+- ✅ Multi-slide carousel builder (1-12 images)
+- ✅ Per-slide caption editor (500 chars)
+- ✅ Template selector per slide (Image Full, Image+Note, Quote, Side-by-Side)
+- ✅ Draft auto-save to localStorage (every 30s)
+- ✅ Publish flow (uploads to Supabase Storage)
+- ✅ Image validation (10MB max, JPG/PNG/WebP)
+- ✅ Slide reordering with drag handles
+- ✅ Post settings (caption, AI flag, privacy)
+
+### Feed Display
+- ✅ Home feed with real posts from database
+- ✅ Post card component with carousel
+- ✅ Infinite scroll pagination
+- ✅ Post metadata (avatar, username, timestamp)
+- ✅ Slide navigation (arrows, dots)
+- ✅ Empty state handling
+
+---
+
 ## 🚧 Not Yet Built
 
-### Phase 2: Post Creation (Next)
-- [ ] Create post page (`/create`)
-- [ ] Image upload component (drag-drop, file picker)
-- [ ] Multi-slide carousel builder
-- [ ] Per-slide caption editor
-- [ ] Template selector per slide
-- [ ] Image processing edge function
-- [ ] Draft auto-save (localStorage)
-- [ ] Publish flow
-
-### Phase 3: Feed & Discovery
-- [ ] Home feed with real posts
-- [ ] Post card component
-- [ ] Infinite scroll
-- [ ] Post viewer modal (full-screen carousel)
+### Phase 3: Post Viewer & Discovery (Next)
+- [ ] Post viewer page (`/post/:id`)
+- [ ] Full-screen post view
 - [ ] Explore page (trending, random, new)
 - [ ] Search users
 
@@ -344,18 +358,15 @@ All tables created with Row Level Security (RLS) policies:
 
 ---
 
-**Last Updated:** October 26, 2024
-**Current Phase:** Foundation Complete ✅
-**Next Phase:** Profile Pages (In Progress) 🚧
+**Last Updated:** October 26, 2025
+**Current Phase:** Phase 2 Complete (Post Creation & Feed) ✅
+**Next Phase:** Post Viewer & Discovery (In Progress) 🚧
 
 ---
 
-## 🎯 Current Sprint: Profile Pages
+## 🎯 Current Sprint: Post Viewer
 
 Building:
-1. Profile page (`/profile/:username`)
-2. Profile header with avatar, bio, stats
-3. Follow/unfollow functionality
-4. Edit profile modal
-5. Avatar upload to Supabase Storage
-6. Posts grid (empty state for now)
+1. Individual post page (`/post/:id`)
+2. Full post detail view with carousel
+3. Link from feed to post viewer

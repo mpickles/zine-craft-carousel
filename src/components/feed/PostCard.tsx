@@ -71,12 +71,16 @@ export const PostCard = ({ post }: PostCardProps) => {
       </div>
 
       {/* Carousel */}
-      <div className="relative aspect-square bg-muted">
-        <img
-          src={images[currentSlide]?.image_url}
-          alt={images[currentSlide]?.caption || "Post image"}
-          className="w-full h-full object-cover"
-        />
+      <Link to={`/post/${post.id}`}>
+        <div className="relative aspect-square bg-muted cursor-pointer">
+          <img
+            src={images[currentSlide]?.image_url}
+            alt={images[currentSlide]?.caption || "Post image"}
+            className="w-full h-full object-cover"
+          />
+        </div>
+      </Link>
+      <div className="relative">{/* Navigation positioned outside Link */}
 
         {/* Navigation Arrows */}
         {images.length > 1 && (
@@ -84,26 +88,35 @@ export const PostCard = ({ post }: PostCardProps) => {
             <Button
               variant="ghost"
               size="icon"
-              className="absolute left-2 top-1/2 -translate-y-1/2 bg-background/80 hover:bg-background/90"
-              onClick={prevSlide}
+              className="absolute left-2 -top-[calc(50%+1rem)] bg-background/80 hover:bg-background/90"
+              onClick={(e) => {
+                e.preventDefault();
+                prevSlide();
+              }}
             >
               <ChevronLeft className="w-5 h-5" />
             </Button>
             <Button
               variant="ghost"
               size="icon"
-              className="absolute right-2 top-1/2 -translate-y-1/2 bg-background/80 hover:bg-background/90"
-              onClick={nextSlide}
+              className="absolute right-2 -top-[calc(50%+1rem)] bg-background/80 hover:bg-background/90"
+              onClick={(e) => {
+                e.preventDefault();
+                nextSlide();
+              }}
             >
               <ChevronRight className="w-5 h-5" />
             </Button>
 
             {/* Dots Indicator */}
-            <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-1.5">
+            <div className="absolute -top-4 left-1/2 -translate-x-1/2 flex gap-1.5">
               {images.map((_, idx) => (
                 <button
                   key={idx}
-                  onClick={() => setCurrentSlide(idx)}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    setCurrentSlide(idx);
+                  }}
                   className={`w-1.5 h-1.5 rounded-full transition-all ${
                     idx === currentSlide
                       ? "bg-foreground w-6"
