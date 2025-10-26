@@ -343,7 +343,7 @@ export type Database = {
           is_private: boolean | null
           last_post_at: string | null
           updated_at: string | null
-          username: string
+          username: string | null
         }
         Insert: {
           account_created_at?: string | null
@@ -357,7 +357,7 @@ export type Database = {
           is_private?: boolean | null
           last_post_at?: string | null
           updated_at?: string | null
-          username: string
+          username?: string | null
         }
         Update: {
           account_created_at?: string | null
@@ -371,7 +371,7 @@ export type Database = {
           is_private?: boolean | null
           last_post_at?: string | null
           updated_at?: string | null
-          username?: string
+          username?: string | null
         }
         Relationships: []
       }
