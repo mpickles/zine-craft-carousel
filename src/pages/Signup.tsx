@@ -68,18 +68,6 @@ const Signup = () => {
 
       if (error) throw error;
 
-      // Update profile with username after signup
-      if (data.user) {
-        const { error: updateError } = await supabase
-          .from("profiles")
-          .update({ username: username.toLowerCase() })
-          .eq("id", data.user.id);
-
-        if (updateError) {
-          console.error("Error updating profile:", updateError);
-        }
-      }
-
       toast.success("Account created! Check your email to verify, then log in.");
       navigate("/login");
     } catch (error: any) {
