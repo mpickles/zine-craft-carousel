@@ -9,6 +9,12 @@ Building Zine - a creator-first social media platform with React + Vite + TypeSc
 
 ## ✅ Completed (Phase 1: Foundation)
 
+**Status: FULLY WORKING ✅**
+- Signup/Login functional
+- Database schema deployed
+- All security policies active
+- Email verification working
+
 ### 1. Database Schema (Supabase)
 All tables created with Row Level Security (RLS) policies:
 
@@ -68,6 +74,11 @@ All tables created with Row Level Security (RLS) policies:
 #### Triggers:
 - **Auto-create profile**: Automatically creates profile row when user signs up
 - **Indexes**: Performance indexes on all frequently queried columns
+
+#### Fixes Applied:
+- ✅ Made `username` nullable (set after signup)
+- ✅ Enabled RLS on `reserved_usernames` table
+- ✅ Email verification configured in Supabase dashboard
 
 ---
 
@@ -335,4 +346,16 @@ All tables created with Row Level Security (RLS) policies:
 
 **Last Updated:** October 26, 2024
 **Current Phase:** Foundation Complete ✅
-**Next Phase:** Post Creation 🚧
+**Next Phase:** Profile Pages (In Progress) 🚧
+
+---
+
+## 🎯 Current Sprint: Profile Pages
+
+Building:
+1. Profile page (`/profile/:username`)
+2. Profile header with avatar, bio, stats
+3. Follow/unfollow functionality
+4. Edit profile modal
+5. Avatar upload to Supabase Storage
+6. Posts grid (empty state for now)
