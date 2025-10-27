@@ -244,21 +244,44 @@ All tables created with Row Level Security (RLS) policies:
 
 ---
 
+## ✅ Completed (Phase 3: Post Viewer)
+
+**Status: FULLY WORKING ✅**
+
+### Post Viewer
+- ✅ Individual post page (`/post/:postId`)
+- ✅ Full-screen carousel display
+- ✅ Per-slide caption rendering
+- ✅ Post metadata (author, timestamp)
+- ✅ Link from feed to post viewer
+- ✅ 404 handling for non-existent posts
+
+---
+
+## ✅ Completed (Phase 4: Profiles)
+
+**Status: FULLY WORKING ✅**
+
+### Profile Pages
+- ✅ Profile page (`/profile/:username`)
+- ✅ Profile header with avatar, display name, username, bio
+- ✅ User stats (posts count, followers, following)
+- ✅ Follow/unfollow button for other users
+- ✅ Edit Profile dialog (own profile only)
+- ✅ Avatar upload to Supabase Storage
+- ✅ Display name and bio editing (500 chars)
+- ✅ Clickable avatar/username navigation from feed
+- ✅ Tabs for Posts/Collections (posts grid placeholder)
+- ✅ Empty state for users with no posts
+- ✅ Loading skeleton states
+
+---
+
 ## 🚧 Not Yet Built
 
-### Phase 3: Post Viewer & Discovery (Next)
-- [ ] Post viewer page (`/post/:id`)
-- [ ] Full-screen post view
+### Phase 3: Discovery (Remaining)
 - [ ] Explore page (trending, random, new)
 - [ ] Search users
-
-### Phase 4: Profiles
-- [ ] Profile page (`/profile/:username`)
-- [ ] Profile header (avatar, bio, stats)
-- [ ] Follow/unfollow button
-- [ ] Edit profile page
-- [ ] Avatar upload
-- [ ] Posts grid
 
 ### Phase 5: Social Features
 - [ ] Like button (optimistic UI)
@@ -358,15 +381,15 @@ All tables created with Row Level Security (RLS) policies:
 
 ---
 
-**Last Updated:** October 26, 2025
-**Current Phase:** Phase 2 Complete (Post Creation & Feed) ✅
-**Next Phase:** Post Viewer & Discovery (In Progress) 🚧
+**Last Updated:** October 27, 2025
+**Current Phase:** Phase 4 Complete (Profiles) ✅
+**Next Phase:** Social Features (Likes & Comments) 🚧
 
 ---
 
-## 🎯 Current Sprint: Post Viewer
+## 🎯 Current Sprint: Social Interactions
 
-Building:
-1. Individual post page (`/post/:id`)
-2. Full post detail view with carousel
-3. Link from feed to post viewer
+Next to build:
+1. Like button with optimistic UI
+2. Comment system with real-time updates
+3. Notifications for social actions
