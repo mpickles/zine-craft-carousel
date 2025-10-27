@@ -277,14 +277,29 @@ All tables created with Row Level Security (RLS) policies:
 
 ---
 
+## ✅ Completed (Phase 5: Social Features - Likes)
+
+**Status: LIKES WORKING ✅**
+
+### Like System
+- ✅ Like button component with optimistic UI
+- ✅ Like/unlike toggle functionality
+- ✅ Real-time like count display
+- ✅ Liked state persisted to database
+- ✅ Visual feedback (filled heart, red color)
+- ✅ Integrated into PostCard and PostView
+- ✅ Auth check (redirects to login)
+- ✅ Custom hook for like management (`useLikes`)
+
+---
+
 ## 🚧 Not Yet Built
 
 ### Phase 3: Discovery (Remaining)
 - [ ] Explore page (trending, random, new)
 - [ ] Search users
 
-### Phase 5: Social Features
-- [ ] Like button (optimistic UI)
+### Phase 5: Social Features (Remaining)
 - [ ] Comment system
 - [ ] Real-time updates (Supabase Realtime)
 - [ ] Notifications dropdown
@@ -382,14 +397,14 @@ All tables created with Row Level Security (RLS) policies:
 ---
 
 **Last Updated:** October 27, 2025
-**Current Phase:** Phase 4 Complete (Profiles) ✅
-**Next Phase:** Social Features (Likes & Comments) 🚧
+**Current Phase:** Phase 5 (Social Features - Likes) ✅
+**Next Phase:** Comments & Notifications 🚧
 
 ---
 
-## 🎯 Current Sprint: Social Interactions
+## 🎯 Current Sprint: Comments
 
 Next to build:
-1. Like button with optimistic UI
-2. Comment system with real-time updates
-3. Notifications for social actions
+1. Comment system with post/edit/delete
+2. Real-time comment updates
+3. Notifications for likes and comments

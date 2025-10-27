@@ -3,8 +3,9 @@ import { Link } from "react-router-dom";
 import { Card } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import { Heart, MessageCircle, Bookmark, ChevronLeft, ChevronRight } from "lucide-react";
+import { MessageCircle, Bookmark, ChevronLeft, ChevronRight } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
+import { LikeButton } from "@/components/post/LikeButton";
 
 interface PostImage {
   id: string;
@@ -132,9 +133,7 @@ export const PostCard = ({ post }: PostCardProps) => {
 
       {/* Actions */}
       <div className="flex items-center gap-4 p-4">
-        <Button variant="ghost" size="icon">
-          <Heart className="w-5 h-5" />
-        </Button>
+        <LikeButton postId={post.id} variant="minimal" />
         <Button variant="ghost" size="icon">
           <MessageCircle className="w-5 h-5" />
         </Button>

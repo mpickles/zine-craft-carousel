@@ -6,7 +6,8 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Card } from "@/components/ui/card";
 import { usePost } from "@/hooks/usePost";
 import { formatDistanceToNow } from "date-fns";
-import { Heart, MessageCircle, Bookmark, ChevronLeft, ChevronRight, ArrowLeft, Loader2 } from "lucide-react";
+import { MessageCircle, Bookmark, ChevronLeft, ChevronRight, ArrowLeft, Loader2 } from "lucide-react";
+import { LikeButton } from "@/components/post/LikeButton";
 
 const PostView = () => {
   const { postId } = useParams<{ postId: string }>();
@@ -143,9 +144,7 @@ const PostView = () => {
 
             {/* Actions */}
             <div className="flex items-center gap-4 p-4">
-              <Button variant="ghost" size="icon">
-                <Heart className="w-5 h-5" />
-              </Button>
+              <LikeButton postId={post.id} variant="minimal" />
               <Button variant="ghost" size="icon">
                 <MessageCircle className="w-5 h-5" />
               </Button>
