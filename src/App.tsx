@@ -8,6 +8,7 @@ import Landing from "./pages/Landing";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import Feed from "./pages/Feed";
+import Explore from "./pages/Explore";
 import Profile from "./pages/Profile";
 import Settings from "./pages/Settings";
 import CreatePost from "./pages/CreatePost";
@@ -49,6 +50,7 @@ const App = () => (
                 </ProtectedRoute>
               }
             />
+            <Route path="/explore" element={<Explore />} />
             <Route path="/profile/:username" element={<Profile />} />
             <Route
               path="/settings"
