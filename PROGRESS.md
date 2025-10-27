@@ -277,9 +277,9 @@ All tables created with Row Level Security (RLS) policies:
 
 ---
 
-## ✅ Completed (Phase 5: Social Features - Likes)
+## ✅ Completed (Phase 5: Social Features)
 
-**Status: LIKES WORKING ✅**
+**Status: LIKES & COMMENTS WORKING ✅**
 
 ### Like System
 - ✅ Like button component with optimistic UI
@@ -291,6 +291,19 @@ All tables created with Row Level Security (RLS) policies:
 - ✅ Auth check (redirects to login)
 - ✅ Custom hook for like management (`useLikes`)
 
+### Comment System
+- ✅ Comment input component with character limit (500 chars)
+- ✅ Comment list with author info and timestamps
+- ✅ Post/Edit/Delete own comments
+- ✅ Real-time comment updates (Supabase Realtime)
+- ✅ Edit indicator for modified comments
+- ✅ Dropdown menu for comment actions
+- ✅ Empty state for no comments
+- ✅ Comment count display
+- ✅ Toggle comments visibility
+- ✅ Custom hook for comment management (`useComments`)
+- ✅ Real-time subscription for INSERT/UPDATE/DELETE
+
 ---
 
 ## 🚧 Not Yet Built
@@ -300,10 +313,9 @@ All tables created with Row Level Security (RLS) policies:
 - [ ] Search users
 
 ### Phase 5: Social Features (Remaining)
-- [ ] Comment system
-- [ ] Real-time updates (Supabase Realtime)
 - [ ] Notifications dropdown
 - [ ] Notifications page
+- [ ] Notification triggers (likes, comments, follows)
 
 ### Phase 6: Collections
 - [ ] Save to collection button
@@ -397,14 +409,14 @@ All tables created with Row Level Security (RLS) policies:
 ---
 
 **Last Updated:** October 27, 2025
-**Current Phase:** Phase 5 (Social Features - Likes) ✅
-**Next Phase:** Comments & Notifications 🚧
+**Current Phase:** Phase 5 (Social Features) ✅
+**Next Phase:** Notifications & Discovery 🚧
 
 ---
 
-## 🎯 Current Sprint: Comments
+## 🎯 Current Sprint: Notifications
 
 Next to build:
-1. Comment system with post/edit/delete
-2. Real-time comment updates
-3. Notifications for likes and comments
+1. Notification system for likes, comments, follows
+2. Notification dropdown in navbar
+3. Notification page with filters

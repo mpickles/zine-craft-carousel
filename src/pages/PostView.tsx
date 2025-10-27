@@ -4,16 +4,22 @@ import { Navbar } from "@/components/layout/Navbar";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Card } from "@/components/ui/card";
+import { Separator } from "@/components/ui/separator";
 import { usePost } from "@/hooks/usePost";
+import { useComments } from "@/hooks/useComments";
 import { formatDistanceToNow } from "date-fns";
 import { MessageCircle, Bookmark, ChevronLeft, ChevronRight, ArrowLeft, Loader2 } from "lucide-react";
 import { LikeButton } from "@/components/post/LikeButton";
+import { CommentInput } from "@/components/post/CommentInput";
+import { CommentList } from "@/components/post/CommentList";
 
 const PostView = () => {
   const { postId } = useParams<{ postId: string }>();
   const navigate = useNavigate();
   const { data: post, isLoading, error } = usePost(postId!);
+  const { comments, isLoading: commentsLoading, postComment, updateComment, deleteComment } = useComments(postId!);
   const [currentSlide, setCurrentSlide] = useState(0);
+  const [showComments, setShowComments] = useState(false);
 
   if (isLoading) {
     return (
@@ -145,9 +151,13 @@ const PostView = () => {
             {/* Actions */}
             <div className="flex items-center gap-4 p-4">
               <LikeButton postId={post.id} variant="minimal" />
-              <Button variant="ghost" size="icon">
+              <button
+                onClick={() => setShowComments(!showComments)}
+                className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors"
+              >
                 <MessageCircle className="w-5 h-5" />
-              </Button>
+                <span className="text-sm font-medium">{comments.length}</span>
+              </button>
               <Button variant="ghost" size="icon" className="ml-auto">
                 <Bookmark className="w-5 h-5" />
               </Button>
@@ -182,6 +192,34 @@ const PostView = () => {
               <div className="px-4 pb-4">
                 <span className="text-xs text-muted-foreground">AI Generated</span>
               </div>
+            )}
+
+            {/* Comments Section */}
+            {showComments && (
+              <>
+                <Separator />
+                <div className="p-4 space-y-6">
+                  <h3 className="font-semibold text-sm">
+                    Comments ({comments.length})
+                  </h3>
+
+                  {/* Comment Input */}
+                  <CommentInput onSubmit={postComment} />
+
+                  {/* Comments List */}
+                  {commentsLoading ? (
+                    <div className="text-center py-4">
+                      <Loader2 className="w-6 h-6 animate-spin mx-auto text-muted-foreground" />
+                    </div>
+                  ) : (
+                    <CommentList
+                      comments={comments}
+                      onUpdate={(commentId, content) => updateComment({ commentId, content })}
+                      onDelete={deleteComment}
+                    />
+                  )}
+                </div>
+              </>
             )}
           </Card>
         </div>
