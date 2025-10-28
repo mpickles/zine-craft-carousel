@@ -421,9 +421,8 @@ export const PostViewerModal = ({
                 <div className="max-h-[300px] overflow-y-auto px-4 py-2">
                   <CommentList
                     comments={comments}
-                    isLoading={commentsLoading}
                     onUpdate={(commentId: string, content: string) => updateComment({ commentId, content })}
-                    onDelete={(commentId: string) => deleteComment({ commentId })}
+                    onDelete={(commentId: string) => deleteComment(commentId)}
                   />
                 </div>
                 <div className="px-4 py-3 border-t border-white/10">

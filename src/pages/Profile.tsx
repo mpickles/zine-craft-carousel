@@ -17,6 +17,7 @@ import { FollowButton } from "@/components/profile/FollowButton";
 import { PostsGrid } from "@/components/profile/PostsGrid";
 import { CollectionsGrid } from "@/components/profile/CollectionsGrid";
 import { FrontPage } from "@/components/profile/FrontPage";
+import { usePostNavigation } from "@/hooks/usePostNavigation";
 
 interface Profile {
   id: string;
