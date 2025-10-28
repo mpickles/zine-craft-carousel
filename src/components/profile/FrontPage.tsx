@@ -1,19 +1,22 @@
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { ExternalLink } from "lucide-react";
+import { FeaturedCollectionWidget } from "@/components/collections/FeaturedCollectionWidget";
 
 interface FrontPageProps {
   userId: string;
   template?: "minimal" | "magazine" | "portfolio";
   bio?: string;
   links?: Array<{ label: string; url: string }>;
+  featuredCollectionId?: string;
 }
 
 export const FrontPage = ({ 
   userId, 
   template = "minimal", 
   bio, 
-  links 
+  links,
+  featuredCollectionId
 }: FrontPageProps) => {
   return (
     <div className="space-y-6">
@@ -24,6 +27,12 @@ export const FrontPage = ({
           <p className="whitespace-pre-wrap text-muted-foreground">{bio}</p>
         </Card>
       )}
+
+      {/* Featured Collection Widget */}
+      <FeaturedCollectionWidget 
+        userId={userId} 
+        collectionId={featuredCollectionId}
+      />
 
       {/* Links */}
       {links && links.length > 0 && (

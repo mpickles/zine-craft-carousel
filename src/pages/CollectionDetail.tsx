@@ -7,8 +7,9 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { toast } from "sonner";
-import { Lock, Globe, Share2, Settings } from "lucide-react";
+import { Lock, Globe, Share2, Settings, Loader2 } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
+import { EditCollectionDialog } from "@/components/collections/EditCollectionDialog";
 
 interface Collection {
   id: string;
@@ -31,8 +32,13 @@ const CollectionDetail = () => {
   const [collection, setCollection] = useState<Collection | null>(null);
   const [posts, setPosts] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [loadingMore, setLoadingMore] = useState(false);
+  const [hasMore, setHasMore] = useState(true);
+  const [showEditDialog, setShowEditDialog] = useState(false);
+  const [saving, setSaving] = useState(false);
 
   const isOwner = user?.id === collection?.user_id;
+  const POSTS_PER_PAGE = 30;
 
   useEffect(() => {
     if (id) {
@@ -40,25 +46,33 @@ const CollectionDetail = () => {
     }
   }, [id]);
 
-  const fetchCollection = async () => {
+  const fetchCollection = async (loadMore = false) => {
     try {
-      setLoading(true);
+      if (loadMore) {
+        setLoadingMore(true);
+      } else {
+        setLoading(true);
+      }
 
-      // Fetch collection details
-      const { data: collectionData, error: collectionError } = await supabase
-        .from("collections")
-        .select(`
-          *,
-          profiles:user_id (username, display_name)
-        `)
-        .eq("id", id)
-        .single();
+      // Fetch collection details (only on initial load)
+      if (!loadMore) {
+        const { data: collectionData, error: collectionError } = await supabase
+          .from("collections")
+          .select(`
+            *,
+            profiles:user_id (username, display_name)
+          `)
+          .eq("id", id)
+          .single();
 
-      if (collectionError) throw collectionError;
+        if (collectionError) throw collectionError;
+        setCollection(collectionData);
+      }
 
-      setCollection(collectionData);
+      // Fetch posts in collection with pagination
+      const from = loadMore ? posts.length : 0;
+      const to = from + POSTS_PER_PAGE - 1;
 
-      // Fetch posts in collection
       const { data: itemsData, error: itemsError } = await supabase
         .from("collection_items")
         .select(`
@@ -76,17 +90,65 @@ const CollectionDetail = () => {
           )
         `)
         .eq("collection_id", id)
-        .order("added_at", { ascending: false });
+        .order("added_at", { ascending: false })
+        .range(from, to);
 
       if (itemsError) throw itemsError;
 
-      setPosts(itemsData?.map((item: any) => item.posts) || []);
+      const newPosts = itemsData?.map((item: any) => item.posts) || [];
+      
+      if (loadMore) {
+        setPosts((prev) => [...prev, ...newPosts]);
+      } else {
+        setPosts(newPosts);
+      }
+
+      setHasMore(newPosts.length === POSTS_PER_PAGE);
     } catch (error: any) {
       console.error("Error fetching collection:", error);
       toast.error("Failed to load collection");
-      navigate("/feed");
+      if (!loadMore) {
+        navigate("/feed");
+      }
     } finally {
       setLoading(false);
+      setLoadingMore(false);
+    }
+  };
+
+  const handleLoadMore = () => {
+    if (!loadingMore && hasMore) {
+      fetchCollection(true);
+    }
+  };
+
+  const handleEditCollection = async (data: {
+    name: string;
+    description: string;
+    isPublic: boolean;
+  }) => {
+    try {
+      setSaving(true);
+
+      const { error } = await supabase
+        .from("collections")
+        .update({
+          name: data.name,
+          description: data.description || null,
+          is_public: data.isPublic,
+          updated_at: new Date().toISOString(),
+        })
+        .eq("id", id);
+
+      if (error) throw error;
+
+      toast.success("Collection updated!");
+      setShowEditDialog(false);
+      fetchCollection(); // Refresh collection data
+    } catch (error: any) {
+      toast.error(error.message || "Failed to update collection");
+    } finally {
+      setSaving(false);
     }
   };
 
@@ -160,7 +222,7 @@ const CollectionDetail = () => {
                       <Button
                         variant="outline"
                         size="sm"
-                        onClick={() => toast.info("Edit feature coming soon!")}
+                        onClick={() => setShowEditDialog(true)}
                       >
                         <Settings className="w-4 h-4 mr-2" />
                         Edit
@@ -221,38 +283,68 @@ const CollectionDetail = () => {
               </p>
             </Card>
           ) : (
-            <div className="grid grid-cols-3 gap-1 md:gap-2">
-              {posts.map((post: any) => {
-                const firstImage = post.post_images.sort(
-                  (a: any, b: any) => a.order_index - b.order_index
-                )[0];
-                const slideCount = post.post_images.length;
+            <>
+              <div className="grid grid-cols-3 gap-1 md:gap-2">
+                {posts.map((post: any) => {
+                  const firstImage = post.post_images.sort(
+                    (a: any, b: any) => a.order_index - b.order_index
+                  )[0];
+                  const slideCount = post.post_images.length;
 
-                return (
-                  <Link
-                    key={post.id}
-                    to={`/post/${post.id}`}
-                    className="relative aspect-square bg-muted overflow-hidden group cursor-pointer"
+                  return (
+                    <Link
+                      key={post.id}
+                      to={`/post/${post.id}`}
+                      className="relative aspect-square bg-muted overflow-hidden group cursor-pointer"
+                    >
+                      <img
+                        src={firstImage?.thumbnail_url || firstImage?.image_url}
+                        alt="Post"
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform"
+                        loading="lazy"
+                      />
+                      {slideCount > 1 && (
+                        <div className="absolute top-2 right-2 bg-black/70 text-white text-xs px-2 py-1 rounded-full">
+                          {slideCount}
+                        </div>
+                      )}
+                      <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors" />
+                    </Link>
+                  );
+                })}
+              </div>
+
+              {/* Load More Button */}
+              {hasMore && (
+                <div className="flex justify-center mt-8">
+                  <Button
+                    variant="outline"
+                    onClick={handleLoadMore}
+                    disabled={loadingMore}
                   >
-                    <img
-                      src={firstImage?.thumbnail_url || firstImage?.image_url}
-                      alt="Post"
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform"
-                      loading="lazy"
-                    />
-                    {slideCount > 1 && (
-                      <div className="absolute top-2 right-2 bg-black/70 text-white text-xs px-2 py-1 rounded-full">
-                        {slideCount}
-                      </div>
+                    {loadingMore ? (
+                      <>
+                        <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                        Loading...
+                      </>
+                    ) : (
+                      "Load More"
                     )}
-                    <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors" />
-                  </Link>
-                );
-              })}
-            </div>
+                  </Button>
+                </div>
+              )}
+            </>
           )}
         </div>
       </main>
+
+      <EditCollectionDialog
+        open={showEditDialog}
+        onOpenChange={setShowEditDialog}
+        collection={collection}
+        onSubmit={handleEditCollection}
+        saving={saving}
+      />
     </div>
   );
 };

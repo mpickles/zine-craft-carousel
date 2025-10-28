@@ -503,17 +503,20 @@ All tables have appropriate indexes for frequently queried columns:
 - ✅ Cover image (first post or placeholder)
 - ✅ Collection name + description
 - ✅ Metadata: post count, public/private, creator, updated time
-- ✅ [Edit] button (if owner) - placeholder
+- ✅ [Edit] button with full edit functionality
+- ✅ Edit dialog: change name, description, privacy settings
 - ✅ [Share] button with native share + clipboard fallback
 - ✅ 3-column grid of posts
 - ✅ Slide count indicators
 - ✅ Empty state for no posts
-- 🔄 Infinite scroll for large collections
+- ✅ Infinite scroll with "Load More" button (30 posts per page)
 
 **Featured Collection Widget:**
-- 🔄 User picks collection to feature on profile
-- 🔄 Shows on Front Page tab
-- 🔄 Displays collection name, cover, and first 3-6 posts
+- ✅ Auto-displays most recent public collection
+- ✅ Shows on Front Page tab
+- ✅ Displays collection name, description, and first 6 posts
+- ✅ "View all" link to full collection
+- ✅ Empty state handling
 
 ## ✅ Completed (Phase 3: Post Viewer)
 
