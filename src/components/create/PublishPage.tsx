@@ -84,17 +84,6 @@ export const PublishPage = ({
       return;
     }
 
-    // Check for missing alt text
-    const missingAltText = slides.some((slide) => !slide.altText.trim());
-    if (missingAltText) {
-      toast({
-        title: 'Alt text required',
-        description: 'Please add alt text to all slides for accessibility',
-        variant: 'destructive',
-      });
-      return;
-    }
-
     onPublish();
   };
 

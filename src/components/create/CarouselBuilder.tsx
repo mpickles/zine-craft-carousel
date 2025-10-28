@@ -220,8 +220,8 @@ export const CarouselBuilder = ({
         ) : (
           <>
             {/* Preview Area */}
-            <div className="flex-1 flex flex-col items-center justify-center p-4 bg-bg-secondary">
-              <div className="w-full max-w-2xl aspect-square bg-bg-primary rounded-lg overflow-hidden shadow-lg">
+            <div className="flex-1 flex flex-col items-center justify-center p-4 bg-bg-secondary overflow-hidden">
+              <div className="w-full max-w-2xl max-h-[55vh] aspect-square bg-bg-primary rounded-lg overflow-hidden shadow-lg">
                 {currentSlide && (
                   <img
                     src={currentSlide.imageUrl}
@@ -232,15 +232,16 @@ export const CarouselBuilder = ({
               </div>
               
               {/* Slide Counter */}
-              <p className="mt-4 text-sm font-medium text-text-secondary">
+              <p className="mt-3 text-sm font-medium text-text-secondary">
                 Slide {currentSlideIndex + 1} of {slides.length}
               </p>
             </div>
 
             {/* Action Buttons */}
-            <div className="flex items-center justify-center gap-3 py-4 px-4 border-t border-border-light">
+            <div className="flex items-center justify-center gap-3 py-3 px-4 border-t border-border-light bg-bg-elevated">
               <Button
                 variant="outline"
+                size="sm"
                 onClick={() => setEditModalOpen(true)}
                 disabled={!currentSlide}
               >
@@ -249,6 +250,7 @@ export const CarouselBuilder = ({
               </Button>
               <Button
                 variant="outline"
+                size="sm"
                 onClick={() => setCaptionModalOpen(true)}
                 disabled={!currentSlide}
               >
@@ -258,7 +260,7 @@ export const CarouselBuilder = ({
             </div>
 
             {/* Bottom Tray */}
-            <div className="border-t border-border-light bg-bg-elevated p-4">
+            <div className="border-t border-border-light bg-bg-elevated p-3">
               <div className="flex items-center gap-3 overflow-x-auto pb-2">
                 <DndContext
                   sensors={sensors}

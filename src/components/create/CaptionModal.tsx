@@ -36,7 +36,7 @@ export const CaptionModal = ({
   };
 
   const isOverLimit = caption.length > MAX_CAPTION_LENGTH;
-  const canSave = !isOverLimit && altText.trim().length > 0;
+  const canSave = !isOverLimit;
 
   if (!isOpen) return null;
 
@@ -70,13 +70,11 @@ export const CaptionModal = ({
 
         {/* Content */}
         <div className="p-4 space-y-4 overflow-y-auto">
-          {/* Alt Text - Required */}
+          {/* Alt Text - Optional */}
           <div className="space-y-2">
             <Label htmlFor="alt-text" className="flex items-center gap-2">
-              Alt text <span className="text-error">*</span>
-              {!altText.trim() && (
-                <span className="text-xs text-error">(required for accessibility)</span>
-              )}
+              Alt text (optional)
+              <span className="text-xs text-text-tertiary">(for accessibility)</span>
             </Label>
             <TextareaAutosize
               id="alt-text"
@@ -86,9 +84,7 @@ export const CaptionModal = ({
               maxLength={200}
               minRows={2}
               maxRows={4}
-              className={`flex w-full rounded-lg border bg-bg-secondary px-3 py-2 text-sm ring-offset-background placeholder:text-text-tertiary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-accent focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 resize-none ${
-                !altText.trim() ? 'border-error' : 'border-border-medium'
-              }`}
+              className="flex w-full rounded-lg border border-border-medium bg-bg-secondary px-3 py-2 text-sm ring-offset-background placeholder:text-text-tertiary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-accent focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 resize-none"
             />
             <p className="text-xs text-text-tertiary text-right">
               {altText.length}/200
@@ -118,7 +114,7 @@ export const CaptionModal = ({
           <div className="flex items-start gap-2 p-3 bg-bg-secondary rounded-lg">
             <span className="text-lg">💡</span>
             <p className="text-sm text-text-secondary">
-              Tip: Keep it concise. Users can swipe to the next slide.
+              Tip: Add alt text to make your content accessible to screen readers.
             </p>
           </div>
         </div>
