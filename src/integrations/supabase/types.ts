@@ -295,7 +295,6 @@ export type Database = {
       post_images: {
         Row: {
           alt_text: string | null
-          aspect_ratio: string | null
           caption: string | null
           created_at: string | null
           crop_data: Json | null
@@ -303,13 +302,14 @@ export type Database = {
           id: string
           image_url: string
           order_index: number
+          original_height: number | null
+          original_width: number | null
           post_id: string
           template: string | null
           thumbnail_url: string | null
         }
         Insert: {
           alt_text?: string | null
-          aspect_ratio?: string | null
           caption?: string | null
           created_at?: string | null
           crop_data?: Json | null
@@ -317,13 +317,14 @@ export type Database = {
           id?: string
           image_url: string
           order_index: number
+          original_height?: number | null
+          original_width?: number | null
           post_id: string
           template?: string | null
           thumbnail_url?: string | null
         }
         Update: {
           alt_text?: string | null
-          aspect_ratio?: string | null
           caption?: string | null
           created_at?: string | null
           crop_data?: Json | null
@@ -331,6 +332,8 @@ export type Database = {
           id?: string
           image_url?: string
           order_index?: number
+          original_height?: number | null
+          original_width?: number | null
           post_id?: string
           template?: string | null
           thumbnail_url?: string | null

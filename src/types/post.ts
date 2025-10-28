@@ -39,9 +39,10 @@ export interface Slide {
   altText?: string; // Optional alt text
   order: number;
   edits: ImageEdits;
-  aspectRatio: '1:1' | '4:5' | '16:9' | '21:9';
   fitMode: 'cover' | 'contain';
   cropData?: CropData;
+  originalWidth?: number;
+  originalHeight?: number;
 }
 
 export interface TaggedUser {
@@ -71,22 +72,9 @@ export const DEFAULT_IMAGE_EDITS: ImageEdits = {
     contrast: 100,
     saturation: 100,
   },
-  fitMode: 'cover',
+  fitMode: 'contain', // Default to contain (show full image)
 };
 
-export const ASPECT_RATIOS = {
-  square: '1:1' as const,
-  portrait: '4:5' as const,
-  landscape: '16:9' as const,
-  wide: '21:9' as const,
-};
-
-export const ASPECT_RATIO_VALUES: Record<string, number> = {
-  '1:1': 1.0,
-  '4:5': 0.8,
-  '16:9': 1.78,
-  '21:9': 2.33,
-};
 
 export const AVAILABLE_TAGS = [
   'Design',

@@ -16,6 +16,9 @@ interface PostImage {
   caption: string | null;
   order_index: number;
   template: string;
+  fit_mode?: string | null;
+  crop_data?: any;
+  alt_text?: string | null;
 }
 
 interface Post {
@@ -108,21 +111,29 @@ export const PostCard = ({ post, onOpenModal }: PostCardPropsExtended) => {
         </div>
       </div>
 
-      {/* First Slide Preview (Square 1:1 thumbnail, always cover) */}
-      <div className="relative aspect-square bg-muted mx-4 rounded-image overflow-hidden">
-        <OptimizedImage
-          src={images[0]?.thumbnail_url || images[0]?.image_url}
-          alt={images[0]?.caption || "Post image"}
-          aspectRatio="square"
-          className="w-full h-full object-cover"
-        />
-        
-        {/* Slide Count Indicator */}
-        {images.length > 1 && (
-          <div className="absolute top-3 right-3 bg-black/70 text-white text-xs font-medium px-2.5 py-1 rounded-full">
-            1/{images.length}
-          </div>
-        )}
+      {/* Image Preview - always square 1:1 container */}
+      <div className="relative mb-4">
+        <div className="aspect-square w-full bg-muted rounded-image overflow-hidden mx-4">
+          {images[0] && (
+            <img
+              src={images[0].thumbnail_url || images[0].image_url}
+              alt={images[0].alt_text || images[0].caption || "Post image"}
+              className="w-full h-full cursor-pointer"
+              style={{
+                objectFit: (images[0].fit_mode as any) || 'contain',
+                objectPosition: 'center',
+              }}
+              onClick={handleCardClick}
+            />
+          )}
+          
+          {/* Slide Count Indicator */}
+          {images.length > 1 && (
+            <div className="absolute top-3 right-3 bg-black/70 text-white text-xs font-medium px-2.5 py-1 rounded-full">
+              1/{images.length}
+            </div>
+          )}
+        </div>
       </div>
 
       {/* Actions */}

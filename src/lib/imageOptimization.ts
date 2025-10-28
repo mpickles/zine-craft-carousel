@@ -81,19 +81,6 @@ export function getCropPosition(cropData?: CropData): string {
   return `${x}% ${y}%`;
 }
 
-/**
- * Calculate aspect ratio numeric value from string
- */
-export function getAspectRatioValue(aspectRatio: string): number {
-  const ratios: Record<string, number> = {
-    '1:1': 1.0,
-    '4:5': 0.8,
-    '16:9': 1.778,
-    '21:9': 2.333,
-  };
-  
-  return ratios[aspectRatio] || 1.0;
-}
 
 /**
  * Apply image edits to get CSS filter string

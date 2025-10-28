@@ -140,7 +140,6 @@ export const CreatePost = () => {
           is_private: visibility === 'followers',
           is_ai_generated: isAIGenerated,
           location: location.trim() || null,
-          aspect_ratio: uploadedSlides[0].aspectRatio || '1:1',
         })
         .select()
         .single();
@@ -156,7 +155,10 @@ export const CreatePost = () => {
         alt_text: slide.altText || null,
         order_index: slide.order,
         template: 'image-full', // Default template for new carousel posts
-        aspect_ratio: slide.aspectRatio || '1:1',
+        fit_mode: slide.fitMode || 'contain',
+        original_width: slide.originalWidth || null,
+        original_height: slide.originalHeight || null,
+        crop_data: slide.cropData ? JSON.parse(JSON.stringify(slide.cropData)) : null,
       }));
 
       const { error: imagesError } = await supabase

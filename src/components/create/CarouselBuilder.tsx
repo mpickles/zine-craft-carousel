@@ -116,8 +116,15 @@ export const CarouselBuilder = ({
         continue;
       }
 
-      // Create preview URL
+      // Create preview URL and detect dimensions
       const imageUrl = URL.createObjectURL(file);
+      
+      // Load image to get dimensions
+      const img = new Image();
+      await new Promise<void>((resolve) => {
+        img.onload = () => resolve();
+        img.src = imageUrl;
+      });
 
       validFiles.push({
         id: `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
@@ -126,8 +133,9 @@ export const CarouselBuilder = ({
         caption: '',
         order: slides.length + validFiles.length,
         edits: DEFAULT_IMAGE_EDITS,
-        aspectRatio: '16:9',
-        fitMode: 'cover',
+        fitMode: 'contain', // Default to contain
+        originalWidth: img.naturalWidth,
+        originalHeight: img.naturalHeight,
       });
     }
 

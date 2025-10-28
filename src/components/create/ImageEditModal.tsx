@@ -28,13 +28,6 @@ export const DEFAULT_IMAGE_EDITS: ImageEdits = {
   fitMode: 'cover',
 };
 
-const ASPECT_RATIOS = [
-  { label: '1:1', value: 1 },
-  { label: '4:5', value: 4 / 5 },
-  { label: '16:9', value: 16 / 9 },
-  { label: 'Free', value: null },
-];
-
 const FILTERS = [
   { label: 'Original', value: 'original' as const, style: '' },
   { label: 'B&W', value: 'bw' as const, style: 'grayscale(100%)' },
@@ -77,12 +70,6 @@ export const ImageEditModal = ({ isOpen, onClose, onSave, imageUrl, initialEdits
     setEdits((prev) => ({ ...prev, flipHorizontal: !prev.flipHorizontal }));
   };
 
-  const handleAspectChange = (aspect: number | null) => {
-    setEdits((prev) => ({
-      ...prev,
-      crop: prev.crop ? { ...prev.crop, aspect } : null,
-    }));
-  };
 
   const handleFilterChange = (filter: ImageEdits['filter']) => {
     setEdits((prev) => ({ ...prev, filter }));
@@ -131,12 +118,12 @@ export const ImageEditModal = ({ isOpen, onClose, onSave, imageUrl, initialEdits
       <div className="flex-1 flex flex-col overflow-hidden">
         {/* Image Preview */}
         <div className="flex-1 relative bg-black">
-          {activeTab === 'crop' ? (
+          {activeTab === 'crop' && edits.fitMode === 'cover' ? (
             <Cropper
               image={imageUrl}
               crop={crop}
               zoom={zoom}
-              aspect={edits.crop?.aspect ?? undefined}
+              aspect={1} // Always 1:1 for feed consistency
               onCropChange={setCrop}
               onCropComplete={onCropComplete}
               onZoomChange={setZoom}
@@ -183,22 +170,11 @@ export const ImageEditModal = ({ isOpen, onClose, onSave, imageUrl, initialEdits
           {/* Fit Mode Tools */}
           {activeTab === 'fit' && (
             <div className="space-y-4">
-              <Label>Image Fit</Label>
+              <Label>Image Display Mode</Label>
+              <p className="text-xs text-muted-foreground mb-2">
+                Default: Contain (shows full image). Choose Cover to fill and crop.
+              </p>
               <div className="space-y-3">
-                <button
-                  onClick={() => setEdits((prev) => ({ ...prev, fitMode: 'cover' }))}
-                  className={`w-full p-4 rounded-lg border-2 transition-colors text-left ${
-                    edits.fitMode === 'cover'
-                      ? 'border-primary bg-primary/10'
-                      : 'border-border hover:border-primary/50'
-                  }`}
-                >
-                  <div className="font-semibold mb-1">Cover (Fill & Crop)</div>
-                  <div className="text-sm text-muted-foreground">
-                    Image fills container, crops edges if needed. Best for photos and portraits.
-                  </div>
-                </button>
-                
                 <button
                   onClick={() => setEdits((prev) => ({ ...prev, fitMode: 'contain' }))}
                   className={`w-full p-4 rounded-lg border-2 transition-colors text-left ${
@@ -209,7 +185,21 @@ export const ImageEditModal = ({ isOpen, onClose, onSave, imageUrl, initialEdits
                 >
                   <div className="font-semibold mb-1">Contain (Show Full Image)</div>
                   <div className="text-sm text-muted-foreground">
-                    Shows entire image with letterboxing if needed. Best for infographics and screenshots.
+                    ✅ Default. Shows entire image with letterboxes if needed. Best for screenshots, infographics, landscapes.
+                  </div>
+                </button>
+                
+                <button
+                  onClick={() => setEdits((prev) => ({ ...prev, fitMode: 'cover' }))}
+                  className={`w-full p-4 rounded-lg border-2 transition-colors text-left ${
+                    edits.fitMode === 'cover'
+                      ? 'border-primary bg-primary/10'
+                      : 'border-border hover:border-primary/50'
+                  }`}
+                >
+                  <div className="font-semibold mb-1">Cover (Fill & Crop)</div>
+                  <div className="text-sm text-muted-foreground">
+                    Fills square container, crops edges. Best for portraits, photos where edges don't matter.
                   </div>
                 </button>
               </div>
@@ -217,21 +207,12 @@ export const ImageEditModal = ({ isOpen, onClose, onSave, imageUrl, initialEdits
           )}
 
           {/* Crop Tools */}
-          {activeTab === 'crop' && (
+          {activeTab === 'crop' && edits.fitMode === 'cover' && (
             <div className="space-y-3">
-              <Label>Aspect Ratio</Label>
-              <div className="flex gap-2 flex-wrap">
-                {ASPECT_RATIOS.map((ratio) => (
-                  <Button
-                    key={ratio.label}
-                    variant={edits.crop?.aspect === ratio.value ? 'default' : 'outline'}
-                    size="sm"
-                    onClick={() => handleAspectChange(ratio.value)}
-                  >
-                    {ratio.label}
-                  </Button>
-                ))}
-              </div>
+              <Label>Adjust Crop Position</Label>
+              <p className="text-xs text-muted-foreground mb-2">
+                Drag to reposition the image within the square container.
+              </p>
               <div className="space-y-2">
                 <Label>Zoom</Label>
                 <Slider
@@ -242,6 +223,12 @@ export const ImageEditModal = ({ isOpen, onClose, onSave, imageUrl, initialEdits
                   step={0.1}
                 />
               </div>
+            </div>
+          )}
+          
+          {activeTab === 'crop' && edits.fitMode === 'contain' && (
+            <div className="p-4 bg-muted rounded-lg text-sm text-muted-foreground">
+              Cropping is only available in Cover mode. Switch to Cover mode in the Fit tab to adjust crop position.
             </div>
           )}
 

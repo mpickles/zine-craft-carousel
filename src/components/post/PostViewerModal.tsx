@@ -291,23 +291,35 @@ export const PostViewerModal = ({
               </button>
             )}
 
-            {/* Image */}
-            <AnimatePresence mode="wait">
-              <motion.div
-                key={currentSlide}
-                initial={{ opacity: 0, x: 100 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: -100 }}
-                transition={{ duration: 0.3 }}
-                className="max-w-full max-h-full p-4"
-              >
-                <img
-                  src={currentImage?.image_url}
-                  alt={currentImage?.caption || `Slide ${currentSlide + 1}`}
-                  className="max-w-full max-h-[70vh] object-contain mx-auto"
-                />
-              </motion.div>
-            </AnimatePresence>
+            {/* Carousel - 1:1 square container matching feed */}
+            <div className="relative flex-1 flex items-center justify-center bg-black px-safe md:px-section">
+              <div className="w-full max-w-3xl mx-auto">
+                <div className="aspect-square bg-muted rounded-image overflow-hidden">
+                  <AnimatePresence mode="wait" initial={false}>
+                    <motion.div
+                      key={currentSlide}
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      exit={{ opacity: 0 }}
+                      transition={{ duration: 0.3 }}
+                      className="w-full h-full"
+                    >
+                      <img
+                        src={currentImage?.image_url}
+                        alt={(currentImage as any)?.alt_text || currentImage?.caption || `Slide ${currentSlide + 1}`}
+                        className="w-full h-full"
+                        style={{
+                          objectFit: (currentImage as any)?.fit_mode || 'contain',
+                          objectPosition: (currentImage as any)?.crop_data 
+                            ? `${(currentImage as any).crop_data.x}% ${(currentImage as any).crop_data.y}%`
+                            : 'center',
+                        }}
+                      />
+                    </motion.div>
+                  </AnimatePresence>
+                </div>
+              </div>
+            </div>
 
             {/* Slide Indicators (Dots) */}
             {totalSlides > 1 && (
