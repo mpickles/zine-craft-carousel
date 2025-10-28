@@ -4,55 +4,78 @@
 
 @layer base {
   :root {
+    /* Editorial Minimalism - Light Mode */
     /* Brand Colors */
-    --brand-primary: 240 29% 14%;
-    --brand-accent: 248 73% 63%;
-    --brand-secondary: 214 17% 35%;
+    --brand-primary: 0 0% 4%;           /* #0A0A0A - True black */
+    --brand-accent: 217 100% 50%;       /* #0066FF - Pure blue */
+    --brand-secondary: 0 0% 40%;        /* #666666 - Mid gray */
     
     /* Backgrounds */
-    --bg-primary: 0 0% 100%;
-    --bg-secondary: 210 17% 98%;
-    --bg-tertiary: 210 16% 93%;
-    --bg-elevated: 0 0% 100%;
+    --bg-primary: 0 0% 100%;            /* #FFFFFF - Pure white */
+    --bg-secondary: 0 0% 98%;           /* #FAFAFA - Off-white */
+    --bg-tertiary: 0 0% 96%;            /* #F5F5F5 - Light gray */
+    --bg-elevated: 0 0% 100%;           /* #FFFFFF */
     
     /* Accent Colors */
-    --accent-purple: 248 73% 63%;
-    --accent-teal: 172 100% 43%;
-    --accent-coral: 0 100% 71%;
-    --accent-amber: 30 100% 58%;
+    --accent-blue: 217 100% 50%;        /* #0066FF - Primary action */
+    --accent-green: 145 100% 39%;       /* #00C853 - Success */
+    --accent-red: 4 100% 60%;           /* #FF3B30 - Error */
+    --accent-amber: 33 100% 50%;        /* #FF9500 - Warning */
     
     /* Status Colors */
-    --success: 172 100% 43%;
-    --warning: 30 100% 58%;
-    --error: 0 100% 71%;
-    --info: 209 72% 59%;
+    --success: 145 100% 39%;
+    --warning: 33 100% 50%;
+    --error: 4 100% 60%;
+    --info: 217 100% 50%;
     
     /* Text Colors */
-    --text-primary: 240 29% 14%;
-    --text-secondary: 214 17% 35%;
-    --text-tertiary: 213 13% 52%;
+    --text-primary: 0 0% 4%;            /* #0A0A0A - High contrast */
+    --text-secondary: 0 0% 40%;         /* #666666 - Readable gray */
+    --text-tertiary: 0 0% 60%;          /* #999999 - De-emphasized */
+    --text-disabled: 0 0% 80%;          /* #CCCCCC */
     
     /* Borders */
-    --border-light: 214 32% 91%;
-    --border-medium: 214 26% 83%;
-    --border-accent: 248 73% 63%;
+    --border-light: 0 0% 94%;           /* #F0F0F0 - Barely visible */
+    --border-medium: 0 0% 88%;          /* #E0E0E0 - Subtle */
+    --border-heavy: 0 0% 80%;           /* #CCCCCC - Defined */
+    --border-accent: 217 100% 50%;      /* #0066FF */
     
-    /* Shadows */
-    --shadow-sm: 0 1px 2px rgba(26, 26, 46, 0.05);
-    --shadow-md: 0 4px 6px rgba(26, 26, 46, 0.07);
-    --shadow-lg: 0 10px 15px rgba(26, 26, 46, 0.1);
+    /* Shadows - Editorial (subtle) */
+    --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.04);
+    --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.08);
+    --shadow-lg: 0 12px 24px rgba(0, 0, 0, 0.12);
     
-    /* Typography */
-    --text-6xl: 3.75rem;
-    --text-5xl: 3rem;
-    --text-3xl: 1.875rem;
-    --text-xl: 1.25rem;
-    --text-base: 1rem;
-    --text-sm: 0.875rem;
+    /* Typography - Editorial Scale */
+    --text-6xl: 4rem;                   /* 64px - Hero only */
+    --text-5xl: 3rem;                   /* 48px - Page titles */
+    --text-4xl: 2rem;                   /* 32px - Section headers */
+    --text-2xl: 1.5rem;                 /* 24px - Card titles */
+    --text-xl: 1.25rem;                 /* 20px - Large body */
+    --text-base: 1rem;                  /* 16px - Body */
+    --text-sm: 0.875rem;                /* 14px - Small */
+    --text-xs: 0.75rem;                 /* 12px - Captions */
     
-    --leading-tight: 1.25;
-    --leading-normal: 1.5;
-    --leading-relaxed: 1.75;
+    /* Line Heights */
+    --leading-none: 1;                  /* Headlines only */
+    --leading-tight: 1.25;              /* Headings */
+    --leading-normal: 1.5;              /* Body */
+    --leading-loose: 1.75;              /* Long-form */
+    
+    /* Letter Spacing */
+    --tracking-tight: -0.02em;          /* Display text */
+    --tracking-normal: -0.01em;         /* UI text */
+    --tracking-wide: 0.05em;            /* ALL CAPS */
+    
+    /* Spacing System (multiples of 4px) */
+    --space-1: 4px;
+    --space-2: 8px;
+    --space-3: 12px;
+    --space-4: 16px;
+    --space-5: 24px;
+    --space-6: 32px;
+    --space-8: 48px;
+    --space-10: 64px;
+    --space-12: 96px;
     
     /* Design System Mappings */
     --background: var(--bg-primary);
@@ -77,84 +100,88 @@
   
   @media (prefers-color-scheme: dark) {
     :root:not([data-theme="light"]) {
-      /* Brand Colors - Dark */
-      --brand-primary: 240 23% 92%;
-      --brand-accent: 248 86% 73%;
-      --brand-secondary: 214 17% 70%;
+      /* iOS-Inspired Dark Mode */
+      --brand-primary: 0 0% 100%;         /* #FFFFFF */
+      --brand-accent: 214 100% 63%;       /* #0A84FF - iOS blue */
+      --brand-secondary: 0 0% 60%;        /* #98989D - iOS gray */
       
       /* Backgrounds - Dark */
-      --bg-primary: 210 27% 9%;
-      --bg-secondary: 222 29% 14%;
-      --bg-tertiary: 218 24% 20%;
-      --bg-elevated: 210 24% 23%;
+      --bg-primary: 0 0% 0%;              /* #000000 - True black */
+      --bg-secondary: 0 0% 11%;           /* #1C1C1E - iOS dark elevated */
+      --bg-tertiary: 0 0% 17%;            /* #2C2C2E - iOS dark grouped */
+      --bg-elevated: 0 0% 11%;            /* #1C1C1E */
       
       /* Accent Colors - Dark */
-      --accent-purple: 248 86% 73%;
-      --accent-teal: 168 81% 65%;
-      --accent-coral: 0 100% 77%;
-      --accent-amber: 37 100% 70%;
+      --accent-blue: 214 100% 63%;        /* #0A84FF */
+      --accent-green: 142 76% 58%;        /* #30D158 */
+      --accent-red: 6 100% 62%;           /* #FF453A */
+      --accent-amber: 36 100% 52%;        /* #FF9F0A */
       
       /* Status Colors - Dark */
-      --success: 168 81% 65%;
-      --warning: 37 100% 70%;
-      --error: 0 100% 77%;
-      --info: 206 89% 70%;
+      --success: 142 76% 58%;
+      --warning: 36 100% 52%;
+      --error: 6 100% 62%;
+      --info: 214 100% 63%;
       
       /* Text Colors - Dark */
-      --text-primary: 210 43% 99%;
-      --text-secondary: 214 26% 83%;
-      --text-tertiary: 211 13% 69%;
+      --text-primary: 0 0% 100%;          /* #FFFFFF */
+      --text-secondary: 0 0% 60%;         /* #98989D - iOS gray */
+      --text-tertiary: 0 0% 40%;          /* #636366 */
+      --text-disabled: 0 0% 28%;          /* #48484A */
       
       /* Borders - Dark */
-      --border-light: 210 24% 23%;
-      --border-medium: 214 17% 35%;
-      --border-accent: 248 86% 73%;
+      --border-light: 0 0% 17%;           /* #2C2C2E */
+      --border-medium: 0 0% 22%;          /* #38383A */
+      --border-heavy: 0 0% 28%;           /* #48484A */
+      --border-accent: 214 100% 63%;      /* #0A84FF */
       
       /* Shadows - Dark */
-      --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
-      --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.4);
-      --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.5);
+      --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.3);
+      --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.5);
+      --shadow-lg: 0 12px 24px rgba(0, 0, 0, 0.7);
     }
   }
   
   [data-theme="dark"] {
-    /* Brand Colors - Dark */
-    --brand-primary: 240 23% 92%;
-    --brand-accent: 248 86% 73%;
-    --brand-secondary: 214 17% 70%;
+    /* iOS-Inspired Dark Mode */
+    --brand-primary: 0 0% 100%;
+    --brand-accent: 214 100% 63%;
+    --brand-secondary: 0 0% 60%;
     
     /* Backgrounds - Dark */
-    --bg-primary: 210 27% 9%;
-    --bg-secondary: 222 29% 14%;
-    --bg-tertiary: 218 24% 20%;
-    --bg-elevated: 210 24% 23%;
+    --bg-primary: 0 0% 0%;
+    --bg-secondary: 0 0% 11%;
+    --bg-tertiary: 0 0% 17%;
+    --bg-elevated: 0 0% 11%;
     
     /* Accent Colors - Dark */
-    --accent-purple: 248 86% 73%;
-    --accent-teal: 168 81% 65%;
-    --accent-coral: 0 100% 77%;
-    --accent-amber: 37 100% 70%;
+    --accent-blue: 214 100% 63%;
+    --accent-green: 142 76% 58%;
+    --accent-red: 6 100% 62%;
+    --accent-amber: 36 100% 52%;
     
     /* Status Colors - Dark */
-    --success: 168 81% 65%;
-    --warning: 37 100% 70%;
-    --error: 0 100% 77%;
-    --info: 206 89% 70%;
+    --success: 142 76% 58%;
+    --warning: 36 100% 52%;
+    --error: 6 100% 62%;
+    --info: 214 100% 63%;
     
     /* Text Colors - Dark */
-    --text-primary: 210 43% 99%;
-    --text-secondary: 214 26% 83%;
-    --text-tertiary: 211 13% 69%;
+    --text-primary: 0 0% 100%;
+    --text-secondary: 0 0% 60%;
+    --text-tertiary: 0 0% 40%;
+    --text-disabled: 0 0% 28%;
     
     /* Borders - Dark */
-    --border-light: 210 24% 23%;
-    --border-medium: 214 17% 35%;
-    --border-accent: 248 86% 73%;
+    --border-light: 0 0% 17%;
+    --border-medium: 0 0% 22%;
+    --border-heavy: 0 0% 28%;
+    --border-accent: 214 100% 63%;
     
     /* Shadows - Dark */
-    --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
-    --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.4);
-    --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.5);
+    --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.3);
+    --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.5);
+    --shadow-lg: 0 12px 24px rgba(0, 0, 0, 0.7);
   }
 }
 
@@ -168,9 +195,40 @@
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
     font-size: 16px;
     line-height: var(--leading-normal);
+    letter-spacing: var(--tracking-normal);
     -webkit-text-size-adjust: 100%;
-    transition: background-color 0.3s ease, color 0.3s ease;
+    transition: background-color 0.15s ease, color 0.15s ease;
   }
+  
+  /* Editorial Typography Hierarchy */
+  h1 {
+    font-family: 'Space Grotesk', -apple-system, BlinkMacSystemFont, sans-serif;
+    font-weight: 700;
+    font-size: var(--text-6xl);
+    line-height: var(--leading-none);
+    letter-spacing: var(--tracking-tight);
+    color: hsl(var(--text-primary));
+  }
+  
+  h2 {
+    font-family: 'Space Grotesk', -apple-system, BlinkMacSystemFont, sans-serif;
+    font-weight: 500;
+    font-size: var(--text-4xl);
+    line-height: var(--leading-tight);
+    letter-spacing: var(--tracking-normal);
+    color: hsl(var(--text-primary));
+  }
+  
+  h3, h4, h5, h6 {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    font-weight: 600;
+    line-height: var(--leading-tight);
+    color: hsl(var(--text-primary));
+  }
+  
+  h3 { font-size: var(--text-xl); }
+  h4 { font-size: var(--text-base); }
+  h5, h6 { font-size: var(--text-sm); }
   
   /* Hide scrollbar but keep functionality */
   .scrollbar-hide::-webkit-scrollbar {
@@ -184,19 +242,30 @@
   /* Font Families */
   .font-primary {
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+    letter-spacing: var(--tracking-normal);
   }
   
-  .font-secondary {
-    font-family: 'Crimson Pro', Georgia, serif;
+  .font-display {
+    font-family: 'Space Grotesk', -apple-system, BlinkMacSystemFont, sans-serif;
+    letter-spacing: var(--tracking-tight);
   }
   
   .font-mono {
     font-family: 'JetBrains Mono', 'Courier New', monospace;
+    letter-spacing: 0;
   }
   
-  /* Accessibility - Focus States */
+  /* Utility Classes for Editorial Design */
+  .text-uppercase {
+    text-transform: uppercase;
+    letter-spacing: var(--tracking-wide);
+    font-size: var(--text-xs);
+    font-weight: 500;
+  }
+  
+  /* Accessibility - Focus States (Editorial) */
   *:focus-visible {
-    outline: 3px solid hsl(var(--border-accent));
+    outline: 2px solid hsl(var(--brand-accent));
     outline-offset: 2px;
   }
   
@@ -222,10 +291,10 @@
     }
   }
   
-  /* Smooth transitions for theme changes */
+  /* Editorial Transitions (fast and subtle) */
   * {
-    transition-property: background-color, border-color, color, fill, stroke;
-    transition-duration: 0.3s;
+    transition-property: background-color, border-color, color, fill, stroke, opacity;
+    transition-duration: 0.15s;
     transition-timing-function: ease;
   }
 }
