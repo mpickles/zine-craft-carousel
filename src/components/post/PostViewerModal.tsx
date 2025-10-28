@@ -211,7 +211,7 @@ export const PostViewerModal = ({
       aria-label="Post viewer"
     >
       <div className="w-full h-full max-w-modal mx-auto flex flex-col bg-black rounded-none md:rounded-component overflow-hidden">
-        {/* Header with breathing room */}
+        {/* Header with poster info and timestamp */}
         <header className="flex items-center justify-between px-4 md:px-6 py-4 bg-black/50 backdrop-blur-md border-b border-white/10">
           <button
             onClick={onClose}
@@ -232,9 +232,14 @@ export const PostViewerModal = ({
                 {post.profiles.username?.[0]?.toUpperCase() || "U"}
               </AvatarFallback>
             </Avatar>
-            <span className="text-white font-semibold text-sm">
-              @{post.profiles.username}
-            </span>
+            <div>
+              <p className="text-white font-semibold text-sm font-mono">
+                @{post.profiles.username}
+              </p>
+              <p className="text-white/60 text-xs font-mono">
+                {formatDistanceToNow(new Date(post.created_at), { addSuffix: true })}
+              </p>
+            </div>
           </Link>
 
           <button
@@ -245,9 +250,9 @@ export const PostViewerModal = ({
           </button>
         </header>
 
-        {/* Main Content Area with proper spacing */}
-        <div className="flex-1 flex flex-col overflow-hidden">
-          {/* Image Carousel with padding */}
+        {/* Main Content Area - Side by side layout on desktop */}
+        <div className="flex-1 flex flex-col md:flex-row overflow-hidden">
+          {/* Image Carousel Section */}
           <div className="relative flex-1 flex items-center justify-center bg-black p-safe" {...swipeHandlers}>
             {/* Navigation Arrows (Desktop) */}
             {currentSlide > 0 && (
@@ -338,112 +343,96 @@ export const PostViewerModal = ({
             )}
 
             {/* Slide Counter */}
-            <div className="absolute top-4 right-4 bg-black/70 text-white text-sm px-3 py-1.5 rounded-full">
+            <div className="absolute top-4 right-4 bg-black/70 text-white text-sm font-mono px-3 py-1.5 rounded-full">
               {currentSlide + 1} / {totalSlides}
             </div>
           </div>
 
-          {/* Per-Slide Caption */}
-          <AnimatePresence mode="wait">
-            {currentImage?.caption && (
-              <motion.div
-                key={currentSlide}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -20 }}
-                transition={{ duration: 0.3 }}
-                className="px-4 py-3 bg-black/50 backdrop-blur-sm border-t border-white/10 max-h-[150px] overflow-y-auto"
-              >
-                <p className="text-white text-sm leading-relaxed">
-                  {currentImage.caption}
-                </p>
-              </motion.div>
-            )}
-          </AnimatePresence>
-
-          {/* Actions Bar */}
-          <div className="flex items-center gap-4 px-4 py-3 bg-black/50 backdrop-blur-md border-t border-white/10">
-            <div className="flex items-center gap-3">
-              <LikeButton postId={post.id} variant="minimal" />
-              <button
-                onClick={() => setShowComments(!showComments)}
-                className="flex items-center gap-2 text-white hover:text-white/80 transition-colors"
-              >
-                <span className="text-2xl">💬</span>
-                <span className="text-sm font-medium">{comments.length}</span>
-              </button>
-            </div>
-
-            <div className="flex items-center gap-2 ml-auto">
-              <SaveButton postId={post.id} size="sm" />
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={handleShare}
-                className="text-white hover:text-white/80"
-              >
-                <Share2 className="w-4 h-4" />
-              </Button>
+          {/* Caption Section - Right side on desktop */}
+          <div className="w-full md:w-80 lg:w-96 border-t md:border-t-0 md:border-l border-white/10 bg-black/50 backdrop-blur-sm flex flex-col">
+            <div className="flex-1 overflow-y-auto p-4">
+              <AnimatePresence mode="wait">
+                {currentImage?.caption ? (
+                  <motion.div
+                    key={currentSlide}
+                    initial={{ opacity: 0, x: 20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: -20 }}
+                    transition={{ duration: 0.3 }}
+                  >
+                    <p className="text-white text-sm leading-relaxed">
+                      {currentImage.caption}
+                    </p>
+                  </motion.div>
+                ) : (
+                  <motion.p
+                    key="no-caption"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    className="text-white/40 text-sm italic"
+                  >
+                    No caption for this slide
+                  </motion.p>
+                )}
+              </AnimatePresence>
             </div>
           </div>
-
-          {/* Post Info */}
-          <div className="px-4 py-3 bg-black/50 backdrop-blur-md border-t border-white/10">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <Link
-                  to={`/profile/${post.profiles.username}`}
-                  className="flex items-center gap-2 hover:opacity-80 transition-opacity"
-                  onClick={(e) => e.stopPropagation()}
-                >
-                  <Avatar className="w-8 h-8">
-                    <AvatarImage src={post.profiles.avatar_url || undefined} />
-                    <AvatarFallback className="bg-primary text-primary-foreground">
-                      {post.profiles.username?.[0]?.toUpperCase() || "U"}
-                    </AvatarFallback>
-                  </Avatar>
-                  <div>
-                    <p className="text-white font-semibold text-sm">
-                      {post.profiles.display_name || post.profiles.username}
-                    </p>
-                    <p className="text-white/60 text-xs">
-                      {formatDistanceToNow(new Date(post.created_at), { addSuffix: true })}
-                    </p>
-                  </div>
-                </Link>
-              </div>
-            </div>
-          </div>
-
-          {/* Comments Section (Collapsible) */}
-          <AnimatePresence>
-            {showComments && (
-              <motion.div
-                initial={{ height: 0, opacity: 0 }}
-                animate={{ height: "auto", opacity: 1 }}
-                exit={{ height: 0, opacity: 0 }}
-                transition={{ duration: 0.3 }}
-                className="bg-black/50 backdrop-blur-md border-t border-white/10 overflow-hidden"
-              >
-                <div className="px-4 py-3 border-b border-white/10">
-                  <h3 className="text-white font-semibold text-sm">
-                    Comments ({comments.length}) ▲
-                  </h3>
-                </div>
-                <div className="max-h-[300px] overflow-y-auto px-4 py-2">
-                  <CommentList
-                    comments={comments}
-                    onUpdate={(commentId: string, content: string) => updateComment({ commentId, content })}
-                    onDelete={(commentId: string) => deleteComment(commentId)}
-                  />
-                </div>
-                <div className="px-4 py-3 border-t border-white/10">
-                  <CommentInput onSubmit={postComment} />
-                </div>
-              </motion.div>
-            )}
-          </AnimatePresence>
         </div>
+
+        {/* Actions Bar */}
+        <div className="flex items-center gap-4 px-4 py-3 bg-black/50 backdrop-blur-md border-t border-white/10">
+          <div className="flex items-center gap-3">
+            <LikeButton postId={post.id} variant="minimal" />
+            <button
+              onClick={() => setShowComments(!showComments)}
+              className="flex items-center gap-2 text-white hover:text-white/80 transition-colors"
+            >
+              <span className="text-2xl">💬</span>
+              <span className="text-sm font-medium">{comments.length}</span>
+            </button>
+          </div>
+
+          <div className="flex items-center gap-2 ml-auto">
+            <SaveButton postId={post.id} size="sm" />
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={handleShare}
+              className="text-white hover:text-white/80"
+            >
+              <Share2 className="w-4 h-4" />
+            </Button>
+          </div>
+        </div>
+
+        {/* Comments Section (Collapsible) */}
+        <AnimatePresence>
+          {showComments && (
+            <motion.div
+              initial={{ height: 0, opacity: 0 }}
+              animate={{ height: "auto", opacity: 1 }}
+              exit={{ height: 0, opacity: 0 }}
+              transition={{ duration: 0.3 }}
+              className="bg-black/50 backdrop-blur-md border-t border-white/10 overflow-hidden"
+            >
+              <div className="px-4 py-3 border-b border-white/10">
+                <h3 className="text-white font-semibold text-sm">
+                  Comments ({comments.length}) ▲
+                </h3>
+              </div>
+              <div className="max-h-[300px] overflow-y-auto px-4 py-2">
+                <CommentList
+                  comments={comments}
+                  onUpdate={(commentId: string, content: string) => updateComment({ commentId, content })}
+                  onDelete={(commentId: string) => deleteComment(commentId)}
+                />
+              </div>
+              <div className="px-4 py-3 border-t border-white/10">
+                <CommentInput onSubmit={postComment} />
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
     </motion.div>
   );
