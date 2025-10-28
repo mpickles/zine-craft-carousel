@@ -33,8 +33,8 @@ export interface Slide {
 }
 
 export interface PostDraft {
-  slides: Slide[];
-  currentSlideIndex: number;
+  // Note: Slides with File objects cannot be serialized to localStorage
+  // Only metadata (tags, settings) can be persisted
   tags: string[];
   isAIGenerated: boolean;
   visibility: 'public' | 'followers';

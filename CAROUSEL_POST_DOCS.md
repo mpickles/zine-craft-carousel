@@ -277,11 +277,12 @@ const [cancelDialogOpen, setCancelDialogOpen] = useState(false);
 - **Auto-save**: Every 30 seconds
 - **Auto-load**: On component mount
 - **Cleared**: After successful publish or manual discard
+- **Important**: Image files (File objects) cannot be persisted to localStorage due to browser limitations. Only metadata (tags, AI flag, visibility) is saved. Images must be re-uploaded after page refresh.
 
 ```typescript
-interface PostDraft {
-  slides: Slide[];
-  currentSlideIndex: number;
+export interface PostDraft {
+  // Note: Slides with File objects cannot be serialized to localStorage
+  // Only metadata (tags, settings) can be persisted
   tags: string[];
   isAIGenerated: boolean;
   visibility: 'public' | 'followers';

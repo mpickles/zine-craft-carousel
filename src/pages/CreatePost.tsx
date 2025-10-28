@@ -39,15 +39,15 @@ export const CreatePost = () => {
   const DRAFT_KEY = 'zine_post_draft';
   
   const saveDraft = () => {
-    const draft: PostDraft = {
-      slides,
-      currentSlideIndex,
+    // Don't save imageFile (File objects can't be serialized)
+    // Only save metadata - images will be lost on page refresh
+    const draftMetadata = {
       tags,
       isAIGenerated,
       visibility,
       lastSaved: Date.now(),
     };
-    localStorage.setItem(DRAFT_KEY, JSON.stringify(draft));
+    localStorage.setItem(DRAFT_KEY, JSON.stringify(draftMetadata));
   };
   
   const loadDraft = (): PostDraft | null => {
@@ -72,20 +72,15 @@ export const CreatePost = () => {
     return () => clearInterval(interval);
   }, [slides, currentSlideIndex, tags, isAIGenerated, visibility]);
   
-  // Load draft on mount
+  // Load draft metadata on mount (images can't be persisted)
   useEffect(() => {
     const draft = loadDraft();
-    if (draft && draft.slides.length > 0) {
-      // Recreate blob URLs for images
-      const restoredSlides = draft.slides.map(slide => ({
-        ...slide,
-        imageUrl: URL.createObjectURL(slide.imageFile),
-      }));
-      setSlides(restoredSlides);
-      setCurrentSlideIndex(draft.currentSlideIndex);
-      setTags(draft.tags);
-      setIsAIGenerated(draft.isAIGenerated);
-      setVisibility(draft.visibility);
+    if (draft) {
+      // Only restore metadata (tags, settings)
+      // Images are lost on page refresh - that's expected behavior
+      if (draft.tags) setTags(draft.tags);
+      if (draft.isAIGenerated !== undefined) setIsAIGenerated(draft.isAIGenerated);
+      if (draft.visibility) setVisibility(draft.visibility);
     }
   }, []);
 
