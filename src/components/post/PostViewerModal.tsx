@@ -250,10 +250,10 @@ export const PostViewerModal = ({
           </button>
         </header>
 
-        {/* Main Content Area - Side by side layout on desktop */}
+        {/* Main Content Area - Side by side layout on desktop (70/30 split) */}
         <div className="flex-1 flex flex-col md:flex-row overflow-hidden">
-          {/* Image Carousel Section */}
-          <div className="relative flex-1 flex items-center justify-center bg-black p-safe" {...swipeHandlers}>
+          {/* Image Carousel Section - 70% on desktop */}
+          <div className="relative flex-1 md:flex-[0.7] flex items-center justify-center bg-black p-safe" {...swipeHandlers}>
             {/* Navigation Arrows (Desktop) */}
             {currentSlide > 0 && (
               <button
@@ -348,8 +348,8 @@ export const PostViewerModal = ({
             </div>
           </div>
 
-          {/* Caption Section - Right side on desktop */}
-          <div className="w-full md:w-80 lg:w-96 border-t md:border-t-0 md:border-l border-white/10 bg-black/50 backdrop-blur-sm flex flex-col">
+          {/* Caption Section - Right side on desktop (30%) */}
+          <div className="w-full md:flex-[0.3] border-t md:border-t-0 md:border-l border-white/10 bg-black/50 backdrop-blur-sm flex flex-col">
             <div className="flex-1 overflow-y-auto p-4">
               <AnimatePresence mode="wait">
                 {currentImage?.caption ? (
