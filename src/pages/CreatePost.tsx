@@ -27,6 +27,7 @@ const CreatePost = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
   const [slides, setSlides] = useState<Slide[]>([]);
+  const [currentSlideIndex, setCurrentSlideIndex] = useState(0);
   const [caption, setCaption] = useState("");
   const [isAiGenerated, setIsAiGenerated] = useState(false);
   const [isPrivate, setIsPrivate] = useState(false);
@@ -209,17 +210,24 @@ const CreatePost = () => {
           {/* Image Upload */}
           <Card className="p-6 mb-6">
             <h2 className="text-xl font-semibold mb-4">Upload Images</h2>
-            <p className="text-sm text-muted-foreground mb-4">
-              Add 1-12 images to create your carousel. Drag to reorder.
-            </p>
-            <ImageUploader slides={slides} onSlidesChange={setSlides} />
+            <ImageUploader 
+              slides={slides} 
+              onSlidesChange={setSlides}
+              currentSlideIndex={currentSlideIndex}
+              onSlideSelect={setCurrentSlideIndex}
+            />
           </Card>
 
           {/* Slide Editor */}
           {slides.length > 0 && (
             <Card className="p-6 mb-6">
-              <h2 className="text-xl font-semibold mb-4">Edit Slides</h2>
-              <SlideEditor slides={slides} onSlidesChange={setSlides} />
+              <h2 className="text-xl font-semibold mb-4">Edit Slide Details</h2>
+              <SlideEditor 
+                slides={slides} 
+                currentSlideIndex={currentSlideIndex}
+                onSlidesChange={setSlides}
+                onSlideIndexChange={setCurrentSlideIndex}
+              />
             </Card>
           )}
 

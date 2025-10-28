@@ -7,13 +7,20 @@ import type { Slide } from "@/pages/CreatePost";
 interface ImageUploaderProps {
   slides: Slide[];
   onSlidesChange: (slides: Slide[]) => void;
+  currentSlideIndex: number;
+  onSlideSelect: (index: number) => void;
 }
 
 const MAX_IMAGES = 12;
 const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
 const ALLOWED_TYPES = ["image/jpeg", "image/png", "image/webp"];
 
-export const ImageUploader = ({ slides, onSlidesChange }: ImageUploaderProps) => {
+export const ImageUploader = ({ 
+  slides, 
+  onSlidesChange,
+  currentSlideIndex,
+  onSlideSelect
+}: ImageUploaderProps) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleFileSelect = (files: FileList | null) => {
@@ -70,11 +77,18 @@ export const ImageUploader = ({ slides, onSlidesChange }: ImageUploaderProps) =>
     e.preventDefault();
   };
 
-  const removeSlide = (id: string) => {
+  const removeSlide = (id: string, index: number) => {
     const updatedSlides = slides
       .filter((s) => s.id !== id)
       .map((s, idx) => ({ ...s, order: idx }));
     onSlidesChange(updatedSlides);
+    
+    // Adjust current slide index if needed
+    if (currentSlideIndex >= updatedSlides.length && updatedSlides.length > 0) {
+      onSlideSelect(updatedSlides.length - 1);
+    } else if (updatedSlides.length === 0) {
+      onSlideSelect(0);
+    }
   };
 
   const moveSlide = (fromIndex: number, toIndex: number) => {
@@ -87,79 +101,113 @@ export const ImageUploader = ({ slides, onSlidesChange }: ImageUploaderProps) =>
   return (
     <div className="space-y-4">
       {/* Upload Area */}
-      <div
-        onDrop={handleDrop}
-        onDragOver={handleDragOver}
-        className="border-2 border-dashed border-border rounded-lg p-8 text-center hover:border-primary transition-colors cursor-pointer"
-        onClick={() => fileInputRef.current?.click()}
-      >
-        <Upload className="w-12 h-12 mx-auto mb-4 text-muted-foreground" />
-        <p className="text-lg font-medium mb-2">
-          Drag and drop images here, or click to select
-        </p>
-        <p className="text-sm text-muted-foreground">
-          JPG, PNG, or WebP • Max 10MB per image • Up to {MAX_IMAGES} images
-        </p>
-        <input
-          ref={fileInputRef}
-          type="file"
-          accept="image/jpeg,image/png,image/webp"
-          multiple
-          className="hidden"
-          onChange={(e) => handleFileSelect(e.target.files)}
-        />
-      </div>
-
-      {/* Image Previews */}
-      {slides.length > 0 && (
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          {slides.map((slide, index) => (
-            <div
-              key={slide.id}
-              className="relative group aspect-square rounded-lg overflow-hidden border border-border bg-muted"
-              draggable
-              onDragStart={(e) => {
-                e.dataTransfer.effectAllowed = "move";
-                e.dataTransfer.setData("text/plain", index.toString());
-              }}
-              onDragOver={(e) => e.preventDefault()}
-              onDrop={(e) => {
-                e.preventDefault();
-                const fromIndex = parseInt(e.dataTransfer.getData("text/plain"));
-                moveSlide(fromIndex, index);
-              }}
-            >
-              <img
-                src={slide.preview}
-                alt={`Slide ${index + 1}`}
-                className="w-full h-full object-cover"
-              />
-              <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                <div className="text-white text-sm font-medium">
-                  Slide {index + 1}
-                </div>
-              </div>
-              <Button
-                variant="destructive"
-                size="icon"
-                className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  removeSlide(slide.id);
-                }}
-              >
-                <X className="w-4 h-4" />
-              </Button>
-            </div>
-          ))}
+      {slides.length === 0 && (
+        <div
+          onDrop={handleDrop}
+          onDragOver={handleDragOver}
+          className="border-2 border-dashed border-border rounded-lg p-12 text-center hover:border-primary transition-colors cursor-pointer"
+          onClick={() => fileInputRef.current?.click()}
+        >
+          <Upload className="w-12 h-12 mx-auto mb-4 text-muted-foreground" />
+          <p className="text-lg font-medium mb-2">
+            Drag and drop images here, or click to select
+          </p>
+          <p className="text-sm text-muted-foreground">
+            JPG, PNG, or WebP • Max 10MB per image • Up to {MAX_IMAGES} images
+          </p>
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept="image/jpeg,image/png,image/webp"
+            multiple
+            className="hidden"
+            onChange={(e) => handleFileSelect(e.target.files)}
+          />
         </div>
       )}
 
+      {/* Horizontal Thumbnail Strip */}
       {slides.length > 0 && (
-        <p className="text-sm text-muted-foreground text-center">
-          {slides.length} / {MAX_IMAGES} images • Drag to reorder
-        </p>
+        <div className="space-y-3">
+          <div className="flex items-center justify-between">
+            <p className="text-sm font-medium">
+              {slides.length} / {MAX_IMAGES} images
+            </p>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => fileInputRef.current?.click()}
+              disabled={slides.length >= MAX_IMAGES}
+            >
+              <Upload className="w-4 h-4 mr-2" />
+              Add More
+            </Button>
+          </div>
+          
+          <div className="flex gap-3 overflow-x-auto pb-2">
+            {slides.map((slide, index) => (
+              <div
+                key={slide.id}
+                className={`relative flex-shrink-0 w-24 h-24 rounded-lg overflow-hidden border-2 transition-all cursor-pointer ${
+                  index === currentSlideIndex
+                    ? "border-primary ring-2 ring-primary/20"
+                    : "border-border hover:border-primary/50"
+                }`}
+                draggable
+                onClick={() => onSlideSelect(index)}
+                onDragStart={(e) => {
+                  e.dataTransfer.effectAllowed = "move";
+                  e.dataTransfer.setData("text/plain", index.toString());
+                }}
+                onDragOver={(e) => e.preventDefault()}
+                onDrop={(e) => {
+                  e.preventDefault();
+                  const fromIndex = parseInt(e.dataTransfer.getData("text/plain"));
+                  moveSlide(fromIndex, index);
+                }}
+              >
+                <img
+                  src={slide.preview}
+                  alt={`Slide ${index + 1}`}
+                  className="w-full h-full object-cover"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex items-end justify-center pb-1">
+                  <span className="text-white text-xs font-medium">
+                    {index + 1}
+                  </span>
+                </div>
+                {!slide.altText && (
+                  <div className="absolute top-1 left-1 w-2 h-2 bg-destructive rounded-full" title="Missing alt text" />
+                )}
+                <Button
+                  variant="destructive"
+                  size="icon"
+                  className="absolute -top-2 -right-2 w-6 h-6 rounded-full opacity-0 hover:opacity-100 transition-opacity"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    removeSlide(slide.id, index);
+                  }}
+                >
+                  <X className="w-3 h-3" />
+                </Button>
+              </div>
+            ))}
+          </div>
+          
+          <p className="text-xs text-muted-foreground">
+            Click a thumbnail to edit • Drag to reorder • Red dot = missing alt text
+          </p>
+        </div>
       )}
+
+      <input
+        ref={fileInputRef}
+        type="file"
+        accept="image/jpeg,image/png,image/webp"
+        multiple
+        className="hidden"
+        onChange={(e) => handleFileSelect(e.target.files)}
+      />
     </div>
   );
 };

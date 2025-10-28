@@ -301,37 +301,49 @@ All tables have appropriate indexes for frequently queried columns:
 
 **Status: FULLY WORKING ✅**
 
-### Post Creation - Carousel Post Composer
+### Post Creation - Carousel Post Composer (REBUILT)
+
 **Upload Interface:**
 - ✅ Drag-and-drop or click to upload 1-12 images
 - ✅ File validation: JPG, PNG, WebP only (max 10MB each)
-- ✅ Horizontal thumbnail strip showing all slides
+- ✅ **Horizontal thumbnail strip** showing all slides (not grid)
+- ✅ **Clickable thumbnails** to select and edit specific slide
 - ✅ Drag thumbnails to reorder slides
-- ✅ Delete slide button on each thumbnail
+- ✅ Delete button on each thumbnail (appears on hover)
+- ✅ Red dot indicator for slides missing alt text
+- ✅ Current slide highlighted with primary border and ring
 
 **Per-Slide Editor:**
-- ✅ Click thumbnail to edit that slide
-- ✅ Four template options (Image-Full, Image+Note, Quote Card, Side-by-Side)
+- ✅ Click thumbnail to edit that slide (instant selection)
+- ✅ **Radio buttons** for four template options (not dropdown):
+  - Image-Full: Full screen image
+  - Image+Note: Image with caption overlay
+  - Quote Card: Text-focused with optional small image
+  - Side-by-Side: Image and text split screen
 - ✅ Caption textarea (500 char limit with live counter)
-- ✅ Alt text field (required for accessibility, 200 chars)
-- ✅ Template preview updates live
+- ✅ Alt text field (required, 200 chars, red border if empty)
+- ✅ **Live preview** updates instantly with template changes
 
 **Post-Level Options:**
 - ✅ Overall post caption (optional, 500 chars)
 - ✅ "This content is AI-generated" checkbox
 - ✅ Public/Private toggle
-- ✅ Navigation: [← Back] [Next →] between slides
+- ✅ Navigation: [← Back] [Next →] buttons between slides
+- ✅ Slide counter showing "Editing Slide X of Y"
 - ✅ [Cancel] button with "Discard draft?" confirmation
-- ✅ [Publish] button (validates: needs ≥1 slide, all slides need alt text)
+- ✅ [Publish] button with validation (≥1 slide, all alt texts required)
+- ✅ Disabled publish button + helper text when alt text missing
 
 **Draft Auto-Save:**
-- ✅ Auto-save draft to IndexedDB every 30 seconds
+- ✅ Auto-save draft to **IndexedDB** every 30 seconds (not localStorage)
 - ✅ Restore draft on return to composer
+- ✅ Clear draft from IndexedDB after publish
 
 **After Publish:**
-- ✅ Upload images to Supabase Storage with optimization
-- ✅ Create post and slide records in database
-- ✅ Redirect to post viewer
+- ✅ Upload images to Supabase Storage (`posts` bucket)
+- ✅ Create post record with metadata
+- ✅ Create post_images records for each slide
+- ✅ **Redirect to post viewer** (`/post/{id}`)
 
 ### Feed Display
 - ✅ Home feed with real posts from database
