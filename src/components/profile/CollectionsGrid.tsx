@@ -5,6 +5,9 @@ import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { Lock, Plus } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
+import { CreateCollectionDialog } from "@/components/collections/CreateCollectionDialog";
+import { toast } from "sonner";
+import { useAuth } from "@/contexts/AuthContext";
 
 interface Collection {
   id: string;
@@ -18,12 +21,14 @@ interface Collection {
 interface CollectionsGridProps {
   userId: string;
   isOwnProfile: boolean;
-  onCreateClick?: () => void;
 }
 
-export const CollectionsGrid = ({ userId, isOwnProfile, onCreateClick }: CollectionsGridProps) => {
+export const CollectionsGrid = ({ userId, isOwnProfile }: CollectionsGridProps) => {
+  const { user } = useAuth();
   const [collections, setCollections] = useState<Collection[]>([]);
   const [loading, setLoading] = useState(true);
+  const [showCreateDialog, setShowCreateDialog] = useState(false);
+  const [saving, setSaving] = useState(false);
 
   useEffect(() => {
     fetchCollections();
@@ -63,6 +68,36 @@ export const CollectionsGrid = ({ userId, isOwnProfile, onCreateClick }: Collect
     }
   };
 
+  const handleCreateCollection = async (name: string, description: string, isPublic: boolean) => {
+    if (!user) return;
+
+    try {
+      setSaving(true);
+
+      // Create collection
+      const { data: newCollection, error: createError } = await supabase
+        .from("collections")
+        .insert({
+          user_id: user.id,
+          name,
+          description: description || null,
+          is_public: isPublic,
+        })
+        .select()
+        .single();
+
+      if (createError) throw createError;
+
+      toast.success("Collection created!");
+      setShowCreateDialog(false);
+      fetchCollections(); // Refresh list
+    } catch (error: any) {
+      toast.error(error.message || "Failed to create collection");
+    } finally {
+      setSaving(false);
+    }
+  };
+
   if (loading) {
     return (
       <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
@@ -75,35 +110,47 @@ export const CollectionsGrid = ({ userId, isOwnProfile, onCreateClick }: Collect
 
   if (collections.length === 0) {
     return (
-      <div className="col-span-3 text-center py-16 bg-muted/30 rounded-lg">
-        <div className="text-6xl mb-4">📁</div>
-        <h3 className="text-xl font-semibold mb-2">No collections yet</h3>
+      <>
+        <div className="col-span-3 text-center py-16 bg-muted/30 rounded-lg">
+          <div className="text-6xl mb-4">📁</div>
+          <h3 className="text-xl font-semibold mb-2">No collections yet</h3>
+          {isOwnProfile && (
+            <>
+              <p className="text-muted-foreground mb-4">
+                Create collections to organize your posts
+              </p>
+              <Button onClick={() => setShowCreateDialog(true)}>
+                <Plus className="w-4 h-4 mr-2" />
+                New Collection
+              </Button>
+            </>
+          )}
+        </div>
+
         {isOwnProfile && (
-          <>
-            <p className="text-muted-foreground mb-4">
-              Create collections to organize your posts
-            </p>
-            <Button onClick={onCreateClick}>
-              <Plus className="w-4 h-4 mr-2" />
-              New Collection
-            </Button>
-          </>
+          <CreateCollectionDialog
+            open={showCreateDialog}
+            onOpenChange={setShowCreateDialog}
+            onSubmit={handleCreateCollection}
+            saving={saving}
+          />
         )}
-      </div>
+      </>
     );
   }
 
   return (
-    <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-      {isOwnProfile && (
-        <Card
-          className="aspect-[3/2] flex flex-col items-center justify-center cursor-pointer hover:bg-muted/50 transition-colors border-dashed"
-          onClick={onCreateClick}
-        >
-          <Plus className="w-8 h-8 mb-2 text-muted-foreground" />
-          <span className="text-sm font-medium">New Collection</span>
-        </Card>
-      )}
+    <>
+      <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+        {isOwnProfile && (
+          <Card
+            className="aspect-[3/2] flex flex-col items-center justify-center cursor-pointer hover:bg-muted/50 transition-colors border-dashed"
+            onClick={() => setShowCreateDialog(true)}
+          >
+            <Plus className="w-8 h-8 mb-2 text-muted-foreground" />
+            <span className="text-sm font-medium">New Collection</span>
+          </Card>
+        )}
 
       {collections.map((collection) => (
         <Link key={collection.id} to={`/collection/${collection.id}`}>
@@ -138,5 +185,15 @@ export const CollectionsGrid = ({ userId, isOwnProfile, onCreateClick }: Collect
         </Link>
       ))}
     </div>
+
+    {isOwnProfile && (
+      <CreateCollectionDialog
+        open={showCreateDialog}
+        onOpenChange={setShowCreateDialog}
+        onSubmit={handleCreateCollection}
+        saving={saving}
+      />
+    )}
+  </>
   );
 };

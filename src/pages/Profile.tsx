@@ -237,7 +237,6 @@ const Profile = () => {
               <CollectionsGrid
                 userId={profile.id}
                 isOwnProfile={isOwnProfile}
-                onCreateClick={() => toast.info("Collections feature coming soon!")}
               />
             </TabsContent>
           </Tabs>
