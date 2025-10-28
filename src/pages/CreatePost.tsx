@@ -18,6 +18,7 @@ export interface Slide {
   file: File;
   preview: string;
   caption: string;
+  altText: string;
   template: "image-full" | "image-note" | "quote" | "side-by-side";
   order: number;
 }
@@ -111,6 +112,7 @@ const CreatePost = () => {
           image_url: publicUrl,
           order_index: index,
           caption: slide.caption || null,
+          alt_text: slide.altText || null,
           template: slide.template,
         });
       });

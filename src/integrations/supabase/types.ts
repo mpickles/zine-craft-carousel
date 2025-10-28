@@ -250,6 +250,7 @@ export type Database = {
       }
       post_images: {
         Row: {
+          alt_text: string | null
           caption: string | null
           created_at: string | null
           id: string
@@ -260,6 +261,7 @@ export type Database = {
           thumbnail_url: string | null
         }
         Insert: {
+          alt_text?: string | null
           caption?: string | null
           created_at?: string | null
           id?: string
@@ -270,6 +272,7 @@ export type Database = {
           thumbnail_url?: string | null
         }
         Update: {
+          alt_text?: string | null
           caption?: string | null
           created_at?: string | null
           id?: string
@@ -386,6 +389,32 @@ export type Database = {
           username?: string
         }
         Relationships: []
+      }
+      saves: {
+        Row: {
+          created_at: string | null
+          post_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          post_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          post_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "saves_post_id_fkey"
+            columns: ["post_id"]
+            isOneToOne: false
+            referencedRelation: "posts"
+            referencedColumns: ["id"]
+          },
+        ]
       }
     }
     Views: {

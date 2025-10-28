@@ -49,6 +49,7 @@ export const ImageUploader = ({ slides, onSlidesChange }: ImageUploaderProps) =>
         file,
         preview: URL.createObjectURL(file),
         caption: "",
+        altText: "",
         template: "image-full",
         order: slides.length + validFiles.length,
       });

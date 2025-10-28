@@ -91,6 +91,22 @@ export const SlideEditor = ({ slides, onSlidesChange }: SlideEditorProps) => {
             </p>
           </div>
 
+          {/* Alt Text for Accessibility */}
+          <div className="space-y-2">
+            <Label htmlFor="alt-text">Alt text (accessibility)</Label>
+            <Textarea
+              id="alt-text"
+              placeholder="Describe this image for screen readers..."
+              value={currentSlide.altText || ""}
+              onChange={(e) => updateSlide({ altText: e.target.value })}
+              maxLength={200}
+              rows={3}
+            />
+            <p className="text-xs text-muted-foreground text-right">
+              {(currentSlide.altText || "").length}/200
+            </p>
+          </div>
+
           {/* Per-Slide Caption */}
           <div className="space-y-2">
             <Label htmlFor="slide-caption">Caption for this slide</Label>

@@ -10,70 +10,146 @@ Building Zine - a creator-first social media platform with React + Vite + TypeSc
 ## ✅ Completed (Phase 1: Foundation)
 
 **Status: FULLY WORKING ✅**
-- Signup/Login functional
-- Database schema deployed
-- All security policies active
+- Signup/Login functional with enhanced password requirements
+- Database schema deployed with all tables and indexes
+- All security policies active (RLS enabled on all tables)
 - Email verification working
+- Age verification (13+ COPPA compliance) implemented
+- Accessibility support (alt text for images)
 
 ### 1. Database Schema (Supabase)
 All tables created with Row Level Security (RLS) policies:
 
 #### Core Tables:
-- **profiles**: User profiles with username, bio, avatar, privacy settings
-  - Unique username constraint (3-20 chars, lowercase, alphanumeric + underscores)
-  - Birthdate for age verification (13+ required)
-  - Email verification tracking
-  - Private/public profile toggle
 
-- **posts**: User posts with captions and privacy
-  - Privacy toggle (public/followers-only)
-  - AI-generated content flag
-  - View count tracking
+**profiles** (User profiles):
+- `id` (UUID, primary key, references auth.users)
+- `username` (text, unique, 3-20 chars, lowercase, alphanumeric + underscores)
+- `display_name` (text)
+- `bio` (text, max 500 chars)
+- `avatar_url` (text)
+- `birthdate` (date, for 13+ age verification)
+- `is_private` (boolean, profile privacy toggle)
+- `email_verified_at` (timestamp)
+- `account_created_at` (timestamp)
+- `last_post_at` (timestamp)
+- `created_at`, `updated_at` (timestamps)
+- Note: Email stored in `auth.users` table for security
 
-- **post_images**: Carousel slides for posts
-  - Multiple images per post (1-12)
-  - Order index for sequencing
-  - Per-slide captions (500 chars)
-  - Template support (image-full, image-note, quote, side-by-side)
-  - Thumbnail URLs for performance
+**posts** (User posts):
+- `id` (UUID, primary key)
+- `user_id` (UUID, foreign key to auth.users)
+- `caption` (text, overall post caption)
+- `is_private` (boolean, default false - public/followers-only)
+- `is_ai_generated` (boolean, default false)
+- `view_count` (integer, default 0)
+- `created_at`, `updated_at` (timestamps)
 
-- **follows**: User relationships
-  - Prevents self-follows (constraint)
-  - Bidirectional tracking
+**post_images** (Carousel slides):
+- `id` (UUID, primary key)
+- `post_id` (UUID, foreign key to posts)
+- `order_index` (integer, 1-12 for slide sequencing)
+- `image_url` (text, required)
+- `thumbnail_url` (text, for performance)
+- `template` (text: 'image-full', 'image-note', 'quote', 'side-by-side')
+- `caption` (text, per-slide caption, max 500 chars)
+- `alt_text` (text, for accessibility/screen readers)
+- `created_at` (timestamp)
 
-- **likes**: Post engagement
-  - One like per user per post
-  - Real-time count tracking
+**collections** (User-curated post collections):
+- `id` (UUID, primary key)
+- `user_id` (UUID, foreign key to auth.users)
+- `name` (text, required, max 100 chars)
+- `description` (text, max 500 chars)
+- `cover_image_url` (text)
+- `is_public` (boolean, default true - public/private toggle)
+- `created_at`, `updated_at` (timestamps)
 
-- **collections**: User-curated post collections
-  - Public/private toggle
-  - Name, description, cover image
+**collection_items** (Posts saved to collections):
+- `collection_id` (UUID, foreign key to collections)
+- `post_id` (UUID, foreign key to posts)
+- `added_at` (timestamp)
+- Unique constraint on (collection_id, post_id)
+- Junction table for many-to-many relationship
 
-- **collection_items**: Posts saved to collections
-  - Junction table for many-to-many relationship
+**follows** (User relationships):
+- `follower_id` (UUID, foreign key to auth.users)
+- `following_id` (UUID, foreign key to auth.users)
+- `created_at` (timestamp)
+- Primary key: (follower_id, following_id)
+- Prevents self-follows (constraint)
+- Bidirectional tracking
 
-- **comments**: Post discussions
-  - Nested under posts
-  - Edit/delete own comments
+**saves** (Quick bookmarks):
+- `user_id` (UUID, foreign key to auth.users)
+- `post_id` (UUID, foreign key to posts)
+- `created_at` (timestamp)
+- Primary key: (user_id, post_id)
+- Quick saves/bookmarks separate from organized collections
 
-- **notifications**: Activity tracking
-  - Types: follow, like, comment, save
-  - Read/unread status
-  - Links to actors and posts
+**likes** (Post engagement):
+- `user_id` (UUID, foreign key to auth.users)
+- `post_id` (UUID, foreign key to posts)
+- `created_at` (timestamp)
+- Primary key: (user_id, post_id)
+- One like per user per post
+
+**comments** (Post discussions):
+- `id` (UUID, primary key)
+- `post_id` (UUID, foreign key to posts)
+- `user_id` (UUID, foreign key to auth.users)
+- `content` (text, comment content)
+- `created_at`, `updated_at` (timestamps)
+- Edit/delete own comments
+
+**notifications** (Activity tracking):
+- `id` (UUID, primary key)
+- `user_id` (UUID, foreign key to auth.users)
+- `actor_id` (UUID, user who triggered notification)
+- `post_id` (UUID, related post if applicable)
+- `type` (text: follow, like, comment, save)
+- `read` (boolean, default false)
+- `created_at` (timestamp)
+
+#### Performance Indexes:
+- `profiles`: username
+- `posts`: user_id, created_at DESC, view_count DESC, (user_id, created_at DESC)
+- `post_images`: (post_id, order_index)
+- `collections`: user_id
+- `collection_items`: collection_id, post_id
+- `follows`: follower_id, following_id
+- `saves`: user_id, post_id
 
 #### Security Tables:
-- **reserved_usernames**: Prevents squatting on @admin, @zine, @help, etc.
+- **reserved_usernames**: Prevents squatting on @admin, @zine, @help, @support, @moderator, @official, @team, @staff
 
 #### Storage:
 - **posts bucket**: Public storage for images
   - Anyone can view
   - Authenticated users can upload
   - Users can delete own images
-  - Path structure: `/posts/{userId}/{timestamp}-{filename}`
+  - Path structure: `/posts/{userId}/{postId}/{timestamp}-{index}.{ext}`
+
+#### Database Functions:
+- **handle_new_user()**: Auto-creates profile when user signs up
+  - Stores username, email_verified_at, account_created_at, birthdate
+  - Security definer function (runs with elevated privileges)
+  - Triggered on INSERT to auth.users
 
 #### Triggers:
-- **Auto-create profile**: Automatically creates profile row when user signs up
-- **Indexes**: Performance indexes on all frequently queried columns
+- **on_auth_user_created**: Calls handle_new_user() after user signup
+
+#### Indexes (Performance Optimization):
+All tables have appropriate indexes for frequently queried columns:
+- `profiles`: username (unique index)
+- `posts`: user_id, created_at DESC, view_count DESC, (user_id, created_at DESC)
+- `post_images`: (post_id, order_index)
+- `collections`: user_id
+- `collection_items`: collection_id, post_id
+- `follows`: follower_id, following_id
+- `likes`: user_id, post_id
+- `saves`: user_id, post_id
+- `comments`: post_id, user_id
 
 #### Fixes Applied:
 - ✅ Made `username` nullable (set after signup)
@@ -230,6 +306,7 @@ All tables created with Row Level Security (RLS) policies:
 - ✅ Image upload component (drag-drop, file picker)
 - ✅ Multi-slide carousel builder (1-12 images)
 - ✅ Per-slide caption editor (500 chars)
+- ✅ **Alt text input for accessibility** (200 chars, screen reader support)
 - ✅ Template selector per slide (Image Full, Image+Note, Quote, Side-by-Side)
 - ✅ Draft auto-save to localStorage (every 30s)
 - ✅ Publish flow (uploads to Supabase Storage)
@@ -330,15 +407,12 @@ All tables created with Row Level Security (RLS) policies:
 
 ## 🚧 Not Yet Built
 
-### Phase 3: Discovery (Remaining)
-- [ ] Search users functionality
+### Phase 6: Saves/Bookmarks
+- [ ] Save/bookmark button on posts
+- [ ] Saved posts page
+- [ ] Quick save functionality (separate from collections)
 
-### Phase 5: Social Features (Remaining)
-- [ ] Notifications dropdown
-- [ ] Notifications page
-- [ ] Notification triggers (likes, comments, follows)
-
-### Phase 6: Collections
+### Phase 7: Collections (Remaining)
 - [ ] Save to collection button
 - [ ] Collection picker modal
 - [ ] Create collection flow
@@ -346,13 +420,13 @@ All tables created with Row Level Security (RLS) policies:
 - [ ] Collection detail page
 - [ ] Featured collection widget
 
-### Phase 7: Moderation
+### Phase 8: Moderation
 - [ ] Report button
 - [ ] Admin dashboard
 - [ ] Content removal flow
 - [ ] Appeal system
 
-### Phase 8: Polish
+### Phase 9: Polish
 - [ ] Legal pages (privacy, terms, guidelines)
 - [ ] Onboarding flow
 - [ ] Open Graph meta tags
