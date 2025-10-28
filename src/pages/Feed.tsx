@@ -46,11 +46,15 @@ const Feed = () => {
           )}
 
           {!isLoading && allPosts.length === 0 && (
-            <div className="bg-card border border-border rounded-lg p-8 text-center">
-              <p className="text-muted-foreground mb-4">
-                Your feed is empty. Start following creators to see their posts here.
+            <div className="bg-card border border-border rounded-lg p-12 text-center space-y-4">
+              <div className="text-6xl mb-4">📭</div>
+              <h3 className="text-2xl font-bold">Your feed is empty!</h3>
+              <p className="text-muted-foreground max-w-md mx-auto">
+                Follow creators to see their posts here
               </p>
-              <Button onClick={() => navigate("/explore")}>Explore</Button>
+              <Button onClick={() => navigate("/explore")} size="lg">
+                Explore
+              </Button>
             </div>
           )}
 

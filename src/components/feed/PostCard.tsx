@@ -1,11 +1,11 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Card } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import { MessageCircle, Bookmark, ChevronLeft, ChevronRight } from "lucide-react";
+import { Bookmark, Share2 } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
-import { LikeButton } from "@/components/post/LikeButton";
+import { toast } from "sonner";
 
 interface PostImage {
   id: string;
@@ -35,22 +35,51 @@ interface PostCardProps {
 }
 
 export const PostCard = ({ post }: PostCardProps) => {
+  const navigate = useNavigate();
   const [currentSlide, setCurrentSlide] = useState(0);
+  const [isSaved, setIsSaved] = useState(false);
   const images = post.post_images.sort((a, b) => a.order_index - b.order_index);
 
-  const nextSlide = () => {
-    setCurrentSlide((prev) => (prev + 1) % images.length);
+  const handleShare = async (e: React.MouseEvent) => {
+    e.stopPropagation();
+    try {
+      await navigator.share({
+        title: `Post by ${post.profiles.username}`,
+        text: post.caption || "Check out this post!",
+        url: `${window.location.origin}/post/${post.id}`,
+      });
+    } catch (error) {
+      // Fallback to clipboard
+      await navigator.clipboard.writeText(`${window.location.origin}/post/${post.id}`);
+      toast.success("Link copied to clipboard!");
+    }
   };
 
-  const prevSlide = () => {
-    setCurrentSlide((prev) => (prev - 1 + images.length) % images.length);
+  const handleSave = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setIsSaved(!isSaved);
+    toast.success(isSaved ? "Removed from saved" : "Saved to bookmarks");
+  };
+
+  const truncateText = (text: string, maxLines: number = 2) => {
+    const words = text.split(" ");
+    if (words.length > 20) {
+      return words.slice(0, 20).join(" ") + "...more";
+    }
+    return text;
   };
 
   return (
-    <Card className="overflow-hidden">
+    <Card 
+      className="overflow-hidden cursor-pointer hover:shadow-lg transition-shadow"
+      onClick={() => navigate(`/post/${post.id}`)}
+    >
       {/* Header */}
       <div className="flex items-center gap-3 p-4">
-        <Link to={`/profile/${post.profiles.username}`}>
+        <Link 
+          to={`/profile/${post.profiles.username}`}
+          onClick={(e) => e.stopPropagation()}
+        >
           <Avatar className="w-10 h-10">
             <AvatarImage src={post.profiles.avatar_url || undefined} />
             <AvatarFallback>
@@ -61,6 +90,7 @@ export const PostCard = ({ post }: PostCardProps) => {
         <div className="flex-1">
           <Link
             to={`/profile/${post.profiles.username}`}
+            onClick={(e) => e.stopPropagation()}
             className="font-semibold text-sm hover:underline"
           >
             {post.profiles.display_name || post.profiles.username}
@@ -71,96 +101,68 @@ export const PostCard = ({ post }: PostCardProps) => {
         </div>
       </div>
 
-      {/* Carousel */}
-      <Link to={`/post/${post.id}`}>
-        <div className="relative aspect-square bg-muted cursor-pointer">
-          <img
-            src={images[currentSlide]?.image_url}
-            alt={images[currentSlide]?.caption || "Post image"}
-            className="w-full h-full object-cover"
-          />
-        </div>
-      </Link>
-      <div className="relative">{/* Navigation positioned outside Link */}
-
-        {/* Navigation Arrows */}
+      {/* First Slide Preview (400x400 thumbnail) */}
+      <div className="relative aspect-square bg-muted">
+        <img
+          src={images[0]?.thumbnail_url || images[0]?.image_url}
+          alt={images[0]?.caption || "Post image"}
+          className="w-full h-full object-cover"
+          loading="lazy"
+        />
+        
+        {/* Slide Count Indicator */}
         {images.length > 1 && (
-          <>
-            <Button
-              variant="ghost"
-              size="icon"
-              className="absolute left-2 -top-[calc(50%+1rem)] bg-background/80 hover:bg-background/90"
-              onClick={(e) => {
-                e.preventDefault();
-                prevSlide();
-              }}
-            >
-              <ChevronLeft className="w-5 h-5" />
-            </Button>
-            <Button
-              variant="ghost"
-              size="icon"
-              className="absolute right-2 -top-[calc(50%+1rem)] bg-background/80 hover:bg-background/90"
-              onClick={(e) => {
-                e.preventDefault();
-                nextSlide();
-              }}
-            >
-              <ChevronRight className="w-5 h-5" />
-            </Button>
-
-            {/* Dots Indicator */}
-            <div className="absolute -top-4 left-1/2 -translate-x-1/2 flex gap-1.5">
-              {images.map((_, idx) => (
-                <button
-                  key={idx}
-                  onClick={(e) => {
-                    e.preventDefault();
-                    setCurrentSlide(idx);
-                  }}
-                  className={`w-1.5 h-1.5 rounded-full transition-all ${
-                    idx === currentSlide
-                      ? "bg-foreground w-6"
-                      : "bg-foreground/40"
-                  }`}
-                  aria-label={`Go to slide ${idx + 1}`}
-                />
-              ))}
-            </div>
-          </>
+          <div className="absolute top-3 right-3 bg-black/70 text-white text-xs px-2 py-1 rounded-full">
+            1/{images.length}
+          </div>
         )}
       </div>
 
       {/* Actions */}
-      <div className="flex items-center gap-4 p-4">
-        <LikeButton postId={post.id} variant="minimal" />
-        <Button variant="ghost" size="icon">
-          <MessageCircle className="w-5 h-5" />
+      <div className="flex items-center gap-2 p-4">
+        <Button 
+          variant="ghost" 
+          size="sm"
+          onClick={handleSave}
+          className={isSaved ? "text-primary" : ""}
+        >
+          <Bookmark className={`w-4 h-4 mr-1 ${isSaved ? "fill-current" : ""}`} />
+          Save
         </Button>
-        <Button variant="ghost" size="icon" className="ml-auto">
-          <Bookmark className="w-5 h-5" />
+        <Button 
+          variant="ghost" 
+          size="sm"
+          onClick={handleShare}
+        >
+          <Share2 className="w-4 h-4 mr-1" />
+          Share
         </Button>
       </div>
 
-      {/* Caption */}
+      {/* Caption (truncated to 2 lines) */}
       {post.caption && (
         <div className="px-4 pb-4">
-          <p className="text-sm">
+          <p className="text-sm line-clamp-2">
             <Link
               to={`/profile/${post.profiles.username}`}
+              onClick={(e) => e.stopPropagation()}
               className="font-semibold hover:underline mr-2"
             >
               {post.profiles.username}
             </Link>
-            {post.caption}
+            <span className="text-muted-foreground">
+              {truncateText(post.caption)}
+            </span>
           </p>
         </div>
       )}
 
       {/* AI Badge */}
       {post.is_ai_generated && (
-        <div className="px-4 pb-4">
-          <span className="text-xs text-muted-foreground">AI Generated</span>
+        <div className="px-4 pb-3">
+          <span className="text-xs text-muted-foreground bg-muted px-2 py-1 rounded-full">
+            🤖 AI Generated
+          </span>
         </div>
       )}
     </Card>

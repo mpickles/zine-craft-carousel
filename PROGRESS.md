@@ -369,13 +369,39 @@ All tables have appropriate indexes for frequently queried columns:
 - ✅ Upload progress toast notification
 - 🔄 Detailed progress bar per image (future enhancement)
 
-### Feed Display
-- ✅ Home feed with real posts from database
-- ✅ Post card component with carousel
-- ✅ Infinite scroll pagination
-- ✅ Post metadata (avatar, username, timestamp)
-- ✅ Slide navigation (arrows, dots)
-- ✅ Empty state handling
+### Home Feed (Following Feed)
+
+**Feed Layout:**
+- ✅ Shows posts from followed users only (filtered by `follows` table)
+- ✅ Reverse chronological order (newest first)
+- ✅ Infinite scroll with 20 posts per page
+- ✅ Real-time updates via Supabase subscriptions
+- ✅ Query invalidation on new posts
+
+**Post Card Design:**
+- ✅ Creator avatar + username (clickable to profile)
+- ✅ Time posted (e.g., "2h ago") using date-fns
+- ✅ First slide preview image (uses 400x400 thumbnail)
+- ✅ Slide count indicator (e.g., "1/5" badge in top-right)
+- ✅ Post caption truncated to 2 lines with "...more"
+- ✅ Action buttons: [Save] [Share]
+- ✅ Share button with native share API + clipboard fallback
+- ✅ Save button with visual feedback
+- ✅ Click anywhere on card → opens post viewer
+- ✅ AI-generated badge when applicable
+
+**Empty State:**
+- ✅ "Your feed is empty!" heading
+- ✅ "Follow creators to see their posts here" message
+- ✅ [Explore] button → links to Explore page
+- ✅ Visual emoji icon for empty state
+
+**Performance:**
+- ✅ Real-time Supabase subscriptions for live feed updates
+- ✅ React Query cache with query invalidation on new posts
+- ✅ Lazy loading images with `loading="lazy"` attribute
+- ✅ Optimized thumbnail images (400x400) for feed previews
+- ✅ Intersection Observer for infinite scroll trigger
 
 ---
 
