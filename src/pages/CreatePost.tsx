@@ -32,19 +32,43 @@ const CreatePost = () => {
   const [isPrivate, setIsPrivate] = useState(false);
   const [publishing, setPublishing] = useState(false);
 
-  // Auto-save draft to localStorage
+  // IndexedDB setup
+  const openDB = (): Promise<IDBDatabase> => {
+    return new Promise((resolve, reject) => {
+      const request = indexedDB.open("PostDraftsDB", 1);
+      
+      request.onerror = () => reject(request.error);
+      request.onsuccess = () => resolve(request.result);
+      
+      request.onupgradeneeded = (event) => {
+        const db = (event.target as IDBOpenDBRequest).result;
+        if (!db.objectStoreNames.contains("drafts")) {
+          db.createObjectStore("drafts", { keyPath: "id" });
+        }
+      };
+    });
+  };
+
+  // Auto-save draft to IndexedDB
   useEffect(() => {
-    const interval = setInterval(() => {
+    const interval = setInterval(async () => {
       if (slides.length > 0 || caption) {
-        localStorage.setItem(
-          "post-draft",
-          JSON.stringify({
+        try {
+          const db = await openDB();
+          const tx = db.transaction("drafts", "readwrite");
+          const store = tx.objectStore("drafts");
+          
+          await store.put({
+            id: "current-draft",
             caption,
             isAiGenerated,
             isPrivate,
             slideCount: slides.length,
-          })
-        );
+            timestamp: Date.now(),
+          });
+        } catch (error) {
+          console.error("Failed to save draft:", error);
+        }
       }
     }, 30000); // Every 30 seconds
 
@@ -53,13 +77,27 @@ const CreatePost = () => {
 
   // Load draft on mount
   useEffect(() => {
-    const draft = localStorage.getItem("post-draft");
-    if (draft) {
-      const parsed = JSON.parse(draft);
-      setCaption(parsed.caption || "");
-      setIsAiGenerated(parsed.isAiGenerated || false);
-      setIsPrivate(parsed.isPrivate || false);
-    }
+    const loadDraft = async () => {
+      try {
+        const db = await openDB();
+        const tx = db.transaction("drafts", "readonly");
+        const store = tx.objectStore("drafts");
+        const request = store.get("current-draft");
+        
+        request.onsuccess = () => {
+          const draft = request.result;
+          if (draft) {
+            setCaption(draft.caption || "");
+            setIsAiGenerated(draft.isAiGenerated || false);
+            setIsPrivate(draft.isPrivate || false);
+          }
+        };
+      } catch (error) {
+        console.error("Failed to load draft:", error);
+      }
+    };
+    
+    loadDraft();
   }, []);
 
   const handlePublish = async () => {
@@ -126,23 +164,20 @@ const CreatePost = () => {
 
       await Promise.all(slidePromises);
 
-      // Clear draft
-      localStorage.removeItem("post-draft");
+      // Clear draft from IndexedDB
+      try {
+        const db = await openDB();
+        const tx = db.transaction("drafts", "readwrite");
+        const store = tx.objectStore("drafts");
+        await store.delete("current-draft");
+      } catch (error) {
+        console.error("Failed to clear draft:", error);
+      }
 
       toast.success("Post published!");
       
-      // Get user's username to navigate to profile
-      const { data: profile } = await supabase
-        .from("profiles")
-        .select("username")
-        .eq("id", user.id)
-        .single();
-
-      if (profile?.username) {
-        navigate(`/profile/${profile.username}`);
-      } else {
-        navigate("/feed");
-      }
+      // Redirect to post viewer
+      navigate(`/post/${post.id}`);
     } catch (error: any) {
       console.error("Error publishing post:", error);
       toast.error(error.message || "Failed to publish post");
@@ -242,9 +277,16 @@ const CreatePost = () => {
           <div className="flex justify-end gap-3">
             <Button
               variant="outline"
-              onClick={() => {
+              onClick={async () => {
                 if (confirm("Discard this draft?")) {
-                  localStorage.removeItem("post-draft");
+                  try {
+                    const db = await openDB();
+                    const tx = db.transaction("drafts", "readwrite");
+                    const store = tx.objectStore("drafts");
+                    await store.delete("current-draft");
+                  } catch (error) {
+                    console.error("Failed to clear draft:", error);
+                  }
                   navigate(-1);
                 }
               }}

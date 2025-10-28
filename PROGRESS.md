@@ -301,25 +301,37 @@ All tables have appropriate indexes for frequently queried columns:
 
 **Status: FULLY WORKING ✅**
 
-### Post Creation
-- ✅ Create post page (`/create`)
-- ✅ **Upload interface**: Drag-drop or click to upload 1-12 images
-- ✅ **File validation**: JPG/PNG/WebP only, max 10MB per image
-- ✅ **Thumbnail strip**: Horizontal thumbnails showing all slides
-- ✅ **Drag to reorder**: Reorder slides by dragging thumbnails
-- ✅ **Delete slides**: Remove button on each thumbnail
-- ✅ **Per-slide editor**: Click thumbnail to edit specific slide
-- ✅ **Template options**: Image Full, Image+Note, Quote, Side-by-Side
-- ✅ **Per-slide caption**: 500 char limit with live counter
-- ✅ **Alt text (required)**: Accessibility requirement, 200 char limit
-- ✅ **Post-level options**: Overall caption (500 chars), AI flag, privacy toggle
-- ✅ **Navigation**: Prev/Next buttons between slides, slide dots
-- ✅ **Draft auto-save**: localStorage every 30s, restores on return
-- ✅ **Publish validation**: Requires ≥1 slide, all slides must have alt text
-- ✅ **Cancel with confirmation**: "Discard draft?" confirmation dialog
-- ✅ **Image upload to Supabase Storage**: With proper path structure
-- ✅ **Database records**: Creates post + post_images records
-- ✅ **Post-publish redirect**: Redirects to user profile
+### Post Creation - Carousel Post Composer
+**Upload Interface:**
+- ✅ Drag-and-drop or click to upload 1-12 images
+- ✅ File validation: JPG, PNG, WebP only (max 10MB each)
+- ✅ Horizontal thumbnail strip showing all slides
+- ✅ Drag thumbnails to reorder slides
+- ✅ Delete slide button on each thumbnail
+
+**Per-Slide Editor:**
+- ✅ Click thumbnail to edit that slide
+- ✅ Four template options (Image-Full, Image+Note, Quote Card, Side-by-Side)
+- ✅ Caption textarea (500 char limit with live counter)
+- ✅ Alt text field (required for accessibility, 200 chars)
+- ✅ Template preview updates live
+
+**Post-Level Options:**
+- ✅ Overall post caption (optional, 500 chars)
+- ✅ "This content is AI-generated" checkbox
+- ✅ Public/Private toggle
+- ✅ Navigation: [← Back] [Next →] between slides
+- ✅ [Cancel] button with "Discard draft?" confirmation
+- ✅ [Publish] button (validates: needs ≥1 slide, all slides need alt text)
+
+**Draft Auto-Save:**
+- ✅ Auto-save draft to IndexedDB every 30 seconds
+- ✅ Restore draft on return to composer
+
+**After Publish:**
+- ✅ Upload images to Supabase Storage with optimization
+- ✅ Create post and slide records in database
+- ✅ Redirect to post viewer
 
 ### Feed Display
 - ✅ Home feed with real posts from database
