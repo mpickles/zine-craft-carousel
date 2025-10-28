@@ -200,7 +200,7 @@ export const PostViewerModal = ({
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="fixed inset-0 bg-black/95 backdrop-blur-sm z-50 flex items-center justify-center"
+      className="fixed inset-0 bg-black/95 backdrop-blur-sm z-50 flex items-center justify-center p-safe md:p-section"
       onClick={(e) => {
         if (e.target === e.currentTarget) {
           onClose();
@@ -210,9 +210,9 @@ export const PostViewerModal = ({
       aria-modal="true"
       aria-label="Post viewer"
     >
-      <div className="w-full h-full max-w-[1200px] mx-auto flex flex-col">
-        {/* Header */}
-        <header className="flex items-center justify-between px-4 py-3 bg-black/50 backdrop-blur-md border-b border-white/10">
+      <div className="w-full h-full max-w-modal mx-auto flex flex-col bg-black rounded-none md:rounded-component overflow-hidden">
+        {/* Header with breathing room */}
+        <header className="flex items-center justify-between px-4 md:px-6 py-4 bg-black/50 backdrop-blur-md border-b border-white/10">
           <button
             onClick={onClose}
             className="w-10 h-10 flex items-center justify-center rounded-full hover:bg-white/10 transition-colors"
@@ -245,10 +245,10 @@ export const PostViewerModal = ({
           </button>
         </header>
 
-        {/* Main Content Area */}
+        {/* Main Content Area with proper spacing */}
         <div className="flex-1 flex flex-col overflow-hidden">
-          {/* Image Carousel */}
-          <div className="relative flex-1 flex items-center justify-center bg-black" {...swipeHandlers}>
+          {/* Image Carousel with padding */}
+          <div className="relative flex-1 flex items-center justify-center bg-black p-safe" {...swipeHandlers}>
             {/* Navigation Arrows (Desktop) */}
             {currentSlide > 0 && (
               <button

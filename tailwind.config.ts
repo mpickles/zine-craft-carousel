@@ -21,6 +21,16 @@ export default {
       "2xl": "1536px",
     },
     extend: {
+      spacing: {
+        'safe': '16px',        // Minimum edge spacing (mobile)
+        'card': '24px',        // Between components
+        'section': '32px',     // Section padding (desktop)
+      },
+      maxWidth: {
+        'feed': '800px',       // Feed container
+        'modal': '900px',      // Modal max width
+        'container': '1200px', // Page container
+      },
       colors: {
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
@@ -117,6 +127,8 @@ export default {
         lg: "var(--radius)",
         md: "calc(var(--radius) - 2px)",
         sm: "calc(var(--radius) - 4px)",
+        'component': '12px',   // Standard component radius
+        'image': '8px',        // Image radius
       },
       keyframes: {
         "accordion-down": {

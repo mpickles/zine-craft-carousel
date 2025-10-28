@@ -78,7 +78,7 @@ export const PostCard = ({ post, onOpenModal }: PostCardPropsExtended) => {
 
   return (
     <Card 
-      className="overflow-hidden cursor-pointer hover:shadow-lg transition-shadow"
+      className="overflow-hidden cursor-pointer hover:shadow-lg transition-shadow bg-card rounded-component"
       onClick={handleCardClick}
     >
       {/* Header */}
@@ -108,8 +108,8 @@ export const PostCard = ({ post, onOpenModal }: PostCardPropsExtended) => {
         </div>
       </div>
 
-      {/* First Slide Preview (400x400 thumbnail) */}
-      <div className="relative aspect-square bg-muted">
+      {/* First Slide Preview (Square 1:1 thumbnail, always cover) */}
+      <div className="relative aspect-square bg-muted mx-4 rounded-image overflow-hidden">
         <OptimizedImage
           src={images[0]?.thumbnail_url || images[0]?.image_url}
           alt={images[0]?.caption || "Post image"}
@@ -119,14 +119,14 @@ export const PostCard = ({ post, onOpenModal }: PostCardPropsExtended) => {
         
         {/* Slide Count Indicator */}
         {images.length > 1 && (
-          <div className="absolute top-3 right-3 bg-black/70 text-white text-xs px-2 py-1 rounded-full">
+          <div className="absolute top-3 right-3 bg-black/70 text-white text-xs font-medium px-2.5 py-1 rounded-full">
             1/{images.length}
           </div>
         )}
       </div>
 
       {/* Actions */}
-      <div className="flex items-center gap-2 p-4">
+      <div className="flex items-center gap-2 px-4 py-3">
         <SaveButton postId={post.id} size="sm" />
         <Button 
           variant="ghost" 
@@ -138,10 +138,10 @@ export const PostCard = ({ post, onOpenModal }: PostCardPropsExtended) => {
         </Button>
       </div>
 
-      {/* Caption (truncated to 2 lines) */}
+      {/* Caption (truncated to 2-3 lines with proper spacing) */}
       {post.caption && (
         <div className="px-4 pb-4">
-          <p className="text-sm line-clamp-2">
+          <p className="text-sm line-clamp-2 leading-relaxed">
             <Link
               to={`/profile/${post.profiles.username}`}
               onClick={(e) => e.stopPropagation()}
@@ -158,7 +158,7 @@ export const PostCard = ({ post, onOpenModal }: PostCardPropsExtended) => {
 
       {/* AI Badge */}
       {post.is_ai_generated && (
-        <div className="px-4 pb-3">
+        <div className="px-4 pb-4">
           <span className="text-xs text-muted-foreground bg-muted px-2 py-1 rounded-full">
             🤖 AI Generated
           </span>

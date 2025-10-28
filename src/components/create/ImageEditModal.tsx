@@ -15,6 +15,19 @@ interface ImageEditModalProps {
   slideCount: number;
 }
 
+export const DEFAULT_IMAGE_EDITS: ImageEdits = {
+  crop: null,
+  rotation: 0,
+  flipHorizontal: false,
+  filter: 'original',
+  adjustments: {
+    brightness: 100,
+    contrast: 100,
+    saturation: 100,
+  },
+  fitMode: 'cover',
+};
+
 const ASPECT_RATIOS = [
   { label: '1:1', value: 1 },
   { label: '4:5', value: 4 / 5 },
@@ -34,7 +47,7 @@ export const ImageEditModal = ({ isOpen, onClose, onSave, imageUrl, initialEdits
   const [crop, setCrop] = useState({ x: 0, y: 0 });
   const [zoom, setZoom] = useState(1);
   const [croppedAreaPixels, setCroppedAreaPixels] = useState(null);
-  const [activeTab, setActiveTab] = useState<'crop' | 'rotate' | 'filter' | 'adjust'>('crop');
+  const [activeTab, setActiveTab] = useState<'fit' | 'crop' | 'rotate' | 'filter' | 'adjust'>('fit');
   const [applyFilterToAll, setApplyFilterToAll] = useState(false);
 
   const onCropComplete = useCallback((croppedArea: any, croppedAreaPixels: any) => {
@@ -149,6 +162,7 @@ export const ImageEditModal = ({ isOpen, onClose, onSave, imageUrl, initialEdits
           {/* Tab Buttons */}
           <div className="flex gap-2 overflow-x-auto pb-2">
             {[
+              { id: 'fit', label: '📐 Fit', icon: '📐' },
               { id: 'crop', label: '🖼️ Crop', icon: '🖼️' },
               { id: 'rotate', label: '🔄 Rotate', icon: '🔄' },
               { id: 'filter', label: '✨ Filter', icon: '✨' },
@@ -165,6 +179,42 @@ export const ImageEditModal = ({ isOpen, onClose, onSave, imageUrl, initialEdits
               </Button>
             ))}
           </div>
+
+          {/* Fit Mode Tools */}
+          {activeTab === 'fit' && (
+            <div className="space-y-4">
+              <Label>Image Fit</Label>
+              <div className="space-y-3">
+                <button
+                  onClick={() => setEdits((prev) => ({ ...prev, fitMode: 'cover' }))}
+                  className={`w-full p-4 rounded-lg border-2 transition-colors text-left ${
+                    edits.fitMode === 'cover'
+                      ? 'border-primary bg-primary/10'
+                      : 'border-border hover:border-primary/50'
+                  }`}
+                >
+                  <div className="font-semibold mb-1">Cover (Fill & Crop)</div>
+                  <div className="text-sm text-muted-foreground">
+                    Image fills container, crops edges if needed. Best for photos and portraits.
+                  </div>
+                </button>
+                
+                <button
+                  onClick={() => setEdits((prev) => ({ ...prev, fitMode: 'contain' }))}
+                  className={`w-full p-4 rounded-lg border-2 transition-colors text-left ${
+                    edits.fitMode === 'contain'
+                      ? 'border-primary bg-primary/10'
+                      : 'border-border hover:border-primary/50'
+                  }`}
+                >
+                  <div className="font-semibold mb-1">Contain (Show Full Image)</div>
+                  <div className="text-sm text-muted-foreground">
+                    Shows entire image with letterboxing if needed. Best for infographics and screenshots.
+                  </div>
+                </button>
+              </div>
+            </div>
+          )}
 
           {/* Crop Tools */}
           {activeTab === 'crop' && (

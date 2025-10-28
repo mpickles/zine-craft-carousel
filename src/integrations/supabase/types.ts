@@ -298,6 +298,8 @@ export type Database = {
           aspect_ratio: string | null
           caption: string | null
           created_at: string | null
+          crop_data: Json | null
+          fit_mode: string | null
           id: string
           image_url: string
           order_index: number
@@ -310,6 +312,8 @@ export type Database = {
           aspect_ratio?: string | null
           caption?: string | null
           created_at?: string | null
+          crop_data?: Json | null
+          fit_mode?: string | null
           id?: string
           image_url: string
           order_index: number
@@ -322,6 +326,8 @@ export type Database = {
           aspect_ratio?: string | null
           caption?: string | null
           created_at?: string | null
+          crop_data?: Json | null
+          fit_mode?: string | null
           id?: string
           image_url?: string
           order_index?: number

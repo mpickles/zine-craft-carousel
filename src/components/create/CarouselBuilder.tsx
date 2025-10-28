@@ -126,6 +126,8 @@ export const CarouselBuilder = ({
         caption: '',
         order: slides.length + validFiles.length,
         edits: DEFAULT_IMAGE_EDITS,
+        aspectRatio: '16:9',
+        fitMode: 'cover',
       });
     }
 
