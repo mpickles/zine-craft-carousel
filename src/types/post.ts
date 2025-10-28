@@ -27,7 +27,7 @@ export interface Slide {
   imageUrl: string; // Local preview URL
   uploadedUrl?: string; // Supabase storage URL after upload
   caption: string;
-  altText: string; // REQUIRED for accessibility (Instagram 2025 standard)
+  altText?: string; // Optional alt text
   order: number;
   edits: ImageEdits;
   aspectRatio?: '1:1' | '4:5' | '16:9'; // Consistent across carousel
@@ -88,7 +88,6 @@ export const AVAILABLE_TAGS = [
 export const MAX_SLIDES = 12;
 export const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
 export const MAX_CAPTION_LENGTH = 2200;
-export const MAX_ALT_TEXT_LENGTH = 100; // Instagram standard
 export const MAX_TAGS = 3;
 export const MAX_TAGGED_USERS = 5; // Instagram standard
 export const MAX_LOCATION_LENGTH = 100;

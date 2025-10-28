@@ -137,26 +137,6 @@ export const PublishPage = ({
       return;
     }
 
-    if (!slides[0].caption.trim()) {
-      toast({
-        title: 'Caption required',
-        description: 'Please add a caption to your first slide - this is what people see in their feed',
-        variant: 'destructive',
-      });
-      return;
-    }
-
-    // Check for missing alt text (Instagram 2025 standard)
-    const slidesWithoutAltText = slides.filter((s) => !s.altText.trim());
-    if (slidesWithoutAltText.length > 0) {
-      toast({
-        title: 'Alt text required',
-        description: `Please add alt text to all ${slidesWithoutAltText.length} slide(s) for accessibility`,
-        variant: 'destructive',
-      });
-      return;
-    }
-
     onPublish();
   };
 

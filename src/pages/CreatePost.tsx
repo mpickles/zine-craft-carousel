@@ -153,7 +153,7 @@ export const CreatePost = () => {
         image_url: slide.uploadedUrl!,
         thumbnail_url: slide.uploadedUrl!, // In production, generate actual thumbnails
         caption: slide.caption,
-        alt_text: slide.altText,
+        alt_text: slide.altText || null,
         order_index: slide.order,
         template: 'image-full', // Default template for new carousel posts
         aspect_ratio: slide.aspectRatio || '1:1',

@@ -124,7 +124,6 @@ export const CarouselBuilder = ({
         imageFile: file,
         imageUrl,
         caption: '',
-        altText: '',
         order: slides.length + validFiles.length,
         edits: DEFAULT_IMAGE_EDITS,
       });
@@ -180,9 +179,9 @@ export const CarouselBuilder = ({
     }
   };
 
-  const handleSaveCaption = (caption: string, altText: string) => {
+  const handleSaveCaption = (caption: string) => {
     const updatedSlides = slides.map((slide, idx) =>
-      idx === currentSlideIndex ? { ...slide, caption, altText } : slide
+      idx === currentSlideIndex ? { ...slide, caption } : slide
     );
     onSlidesChange(updatedSlides);
   };
@@ -352,7 +351,6 @@ export const CarouselBuilder = ({
             onClose={() => setCaptionModalOpen(false)}
             onSave={handleSaveCaption}
             initialCaption={currentSlide.caption}
-            initialAltText={currentSlide.altText}
             slideNumber={currentSlideIndex + 1}
           />
         </>
