@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Bookmark, Share2 } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 import { toast } from "sonner";
+import { SaveButton } from "@/components/collections/SaveButton";
 
 interface PostImage {
   id: string;
@@ -37,7 +38,6 @@ interface PostCardProps {
 export const PostCard = ({ post }: PostCardProps) => {
   const navigate = useNavigate();
   const [currentSlide, setCurrentSlide] = useState(0);
-  const [isSaved, setIsSaved] = useState(false);
   const images = post.post_images.sort((a, b) => a.order_index - b.order_index);
 
   const handleShare = async (e: React.MouseEvent) => {
@@ -53,12 +53,6 @@ export const PostCard = ({ post }: PostCardProps) => {
       await navigator.clipboard.writeText(`${window.location.origin}/post/${post.id}`);
       toast.success("Link copied to clipboard!");
     }
-  };
-
-  const handleSave = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    setIsSaved(!isSaved);
-    toast.success(isSaved ? "Removed from saved" : "Saved to bookmarks");
   };
 
   const truncateText = (text: string, maxLines: number = 2) => {
@@ -120,15 +114,7 @@ export const PostCard = ({ post }: PostCardProps) => {
 
       {/* Actions */}
       <div className="flex items-center gap-2 p-4">
-        <Button 
-          variant="ghost" 
-          size="sm"
-          onClick={handleSave}
-          className={isSaved ? "text-primary" : ""}
-        >
-          <Bookmark className={`w-4 h-4 mr-1 ${isSaved ? "fill-current" : ""}`} />
-          Save
-        </Button>
+        <SaveButton postId={post.id} size="sm" />
         <Button 
           variant="ghost" 
           size="sm"

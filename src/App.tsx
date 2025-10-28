@@ -13,6 +13,7 @@ import Profile from "./pages/Profile";
 import Settings from "./pages/Settings";
 import CreatePost from "./pages/CreatePost";
 import PostView from "./pages/PostView";
+import CollectionDetail from "./pages/CollectionDetail";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -69,6 +70,7 @@ const App = () => (
               }
             />
             <Route path="/post/:postId" element={<PostView />} />
+            <Route path="/collection/:id" element={<CollectionDetail />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </AuthProvider>

@@ -473,6 +473,48 @@ All tables have appropriate indexes for frequently queried columns:
 - ✅ Latest Posts widget (implemented)
 - 🔄 Auto-create on signup with default content
 
+### Save & Collection System
+
+**Save Button:**
+- ✅ Bookmark icon on every post (feed, viewer, profile)
+- ✅ Click → opens collection picker modal
+- ✅ Checks save status from database
+- ✅ Works when logged out (redirects to login)
+
+**Collection Picker Modal:**
+- ✅ List of user's collections (name + post count)
+- ✅ Checkbox next to each collection
+- ✅ Checked = post is in that collection
+- ✅ Toggle to add/remove from collections
+- ✅ [+ New Collection] button at top
+- ✅ [Done] button closes modal
+- ✅ Auto-refreshes after changes
+
+**Create Collection:**
+- ✅ Modal with form:
+  - Name (required, 100 char max)
+  - Description (optional, 500 chars)
+  - Public/Private toggle (default: public)
+- ✅ [Create] button saves to database
+- ✅ Auto-adds current post to new collection
+- ✅ Returns to picker after creation
+
+**Collection Detail Page:**
+- ✅ Cover image (first post or placeholder)
+- ✅ Collection name + description
+- ✅ Metadata: post count, public/private, creator, updated time
+- ✅ [Edit] button (if owner) - placeholder
+- ✅ [Share] button with native share + clipboard fallback
+- ✅ 3-column grid of posts
+- ✅ Slide count indicators
+- ✅ Empty state for no posts
+- 🔄 Infinite scroll for large collections
+
+**Featured Collection Widget:**
+- 🔄 User picks collection to feature on profile
+- 🔄 Shows on Front Page tab
+- 🔄 Displays collection name, cover, and first 3-6 posts
+
 ## ✅ Completed (Phase 3: Post Viewer)
 
 **Status: FULLY WORKING ✅**
