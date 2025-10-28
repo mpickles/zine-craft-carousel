@@ -17,34 +17,34 @@ const Explore = () => {
     <div className="min-h-screen bg-background">
       <Navbar />
 
-      <main className="container mx-auto px-4 py-8">
+      <main className="container mx-auto px-4 py-4 sm:py-8">
         <div className="max-w-4xl mx-auto">
           {/* Header */}
-          <div className="mb-8">
-            <h1 className="text-3xl font-bold mb-2">Explore</h1>
-            <p className="text-muted-foreground">
+          <div className="mb-6 sm:mb-8">
+            <h1 className="text-2xl sm:text-3xl font-bold mb-2">Explore</h1>
+            <p className="text-sm sm:text-base text-muted-foreground">
               Discover amazing content from creators around the world
             </p>
           </div>
 
           {/* Tabs */}
           <Tabs value={mode} onValueChange={(value) => setMode(value as ExploreMode)}>
-            <TabsList className="grid w-full grid-cols-3 mb-8">
-              <TabsTrigger value="trending" className="gap-2">
+            <TabsList className="grid w-full grid-cols-3 mb-6 sm:mb-8">
+              <TabsTrigger value="trending" className="gap-1 sm:gap-2">
                 <TrendingUp className="w-4 h-4" />
-                Trending
+                <span className="hidden xs:inline">Trending</span>
               </TabsTrigger>
-              <TabsTrigger value="new" className="gap-2">
+              <TabsTrigger value="new" className="gap-1 sm:gap-2">
                 <Clock className="w-4 h-4" />
-                New
+                <span className="hidden xs:inline">New</span>
               </TabsTrigger>
-              <TabsTrigger value="random" className="gap-2">
+              <TabsTrigger value="random" className="gap-1 sm:gap-2">
                 <Shuffle className="w-4 h-4" />
-                Random
+                <span className="hidden xs:inline">Random</span>
               </TabsTrigger>
             </TabsList>
 
-            <TabsContent value="trending" className="space-y-6">
+            <TabsContent value="trending" className="space-y-4 sm:space-y-6">
               {isLoading ? (
                 <LoadingSkeleton />
               ) : posts.length === 0 ? (
@@ -54,7 +54,7 @@ const Explore = () => {
               )}
             </TabsContent>
 
-            <TabsContent value="new" className="space-y-6">
+            <TabsContent value="new" className="space-y-4 sm:space-y-6">
               {isLoading ? (
                 <LoadingSkeleton />
               ) : posts.length === 0 ? (
@@ -64,7 +64,7 @@ const Explore = () => {
               )}
             </TabsContent>
 
-            <TabsContent value="random" className="space-y-6">
+            <TabsContent value="random" className="space-y-4 sm:space-y-6">
               {isLoading ? (
                 <LoadingSkeleton />
               ) : posts.length === 0 ? (

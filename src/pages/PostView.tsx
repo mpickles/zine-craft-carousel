@@ -20,6 +20,11 @@ const PostView = () => {
   const { comments, isLoading: commentsLoading, postComment, updateComment, deleteComment } = useComments(postId!);
   const [currentSlide, setCurrentSlide] = useState(0);
   const [showComments, setShowComments] = useState(false);
+  const [touchStart, setTouchStart] = useState<number | null>(null);
+  const [touchEnd, setTouchEnd] = useState<number | null>(null);
+
+  // Minimum swipe distance (in px)
+  const minSwipeDistance = 50;
 
   if (isLoading) {
     return (
@@ -61,11 +66,35 @@ const PostView = () => {
     setCurrentSlide((prev) => (prev - 1 + images.length) % images.length);
   };
 
+  const onTouchStart = (e: React.TouchEvent) => {
+    setTouchEnd(null);
+    setTouchStart(e.targetTouches[0].clientX);
+  };
+
+  const onTouchMove = (e: React.TouchEvent) => {
+    setTouchEnd(e.targetTouches[0].clientX);
+  };
+
+  const onTouchEnd = () => {
+    if (!touchStart || !touchEnd) return;
+    
+    const distance = touchStart - touchEnd;
+    const isLeftSwipe = distance > minSwipeDistance;
+    const isRightSwipe = distance < -minSwipeDistance;
+
+    if (isLeftSwipe && images.length > 1) {
+      nextSlide();
+    }
+    if (isRightSwipe && images.length > 1) {
+      prevSlide();
+    }
+  };
+
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
 
-      <main className="container mx-auto px-4 py-8">
+      <main className="container mx-auto px-4 py-4 sm:py-8">
         <div className="max-w-2xl mx-auto">
           {/* Back Button */}
           <Button
@@ -79,7 +108,7 @@ const PostView = () => {
 
           <Card className="overflow-hidden">
             {/* Header */}
-            <div className="flex items-center gap-3 p-4">
+            <div className="flex items-center gap-3 p-3 sm:p-4">
               <Link to={`/profile/${post.profiles.username}`}>
                 <Avatar className="w-10 h-10">
                   <AvatarImage src={post.profiles.avatar_url || undefined} />
@@ -102,11 +131,17 @@ const PostView = () => {
             </div>
 
             {/* Carousel */}
-            <div className="relative aspect-square bg-muted">
+            <div 
+              className="relative aspect-square bg-muted"
+              onTouchStart={onTouchStart}
+              onTouchMove={onTouchMove}
+              onTouchEnd={onTouchEnd}
+            >
               <img
                 src={images[currentSlide]?.image_url}
                 alt={images[currentSlide]?.caption || "Post image"}
-                className="w-full h-full object-cover"
+                className="w-full h-full object-cover select-none"
+                draggable={false}
               />
 
               {/* Navigation Arrows */}
@@ -115,7 +150,7 @@ const PostView = () => {
                   <Button
                     variant="ghost"
                     size="icon"
-                    className="absolute left-2 top-1/2 -translate-y-1/2 bg-background/80 hover:bg-background/90"
+                    className="absolute left-2 top-1/2 -translate-y-1/2 bg-background/80 hover:bg-background/90 h-11 w-11"
                     onClick={prevSlide}
                   >
                     <ChevronLeft className="w-5 h-5" />
@@ -123,7 +158,7 @@ const PostView = () => {
                   <Button
                     variant="ghost"
                     size="icon"
-                    className="absolute right-2 top-1/2 -translate-y-1/2 bg-background/80 hover:bg-background/90"
+                    className="absolute right-2 top-1/2 -translate-y-1/2 bg-background/80 hover:bg-background/90 h-11 w-11"
                     onClick={nextSlide}
                   >
                     <ChevronRight className="w-5 h-5" />
@@ -135,10 +170,10 @@ const PostView = () => {
                       <button
                         key={idx}
                         onClick={() => setCurrentSlide(idx)}
-                        className={`w-1.5 h-1.5 rounded-full transition-all ${
+                        className={`h-2 rounded-full transition-all touch-none ${
                           idx === currentSlide
-                            ? "bg-foreground w-6"
-                            : "bg-foreground/40"
+                            ? "bg-foreground w-8"
+                            : "bg-foreground/40 w-2"
                         }`}
                         aria-label={`Go to slide ${idx + 1}`}
                       />

@@ -124,32 +124,33 @@ const Profile = () => {
     <div className="min-h-screen bg-background">
       <Navbar />
 
-      <main className="container mx-auto px-4 py-8">
+      <main className="container mx-auto px-4 py-4 sm:py-8">
         <div className="max-w-5xl mx-auto">
           {/* Profile Header */}
-          <Card className="p-8 mb-6">
-            <div className="flex flex-col md:flex-row gap-8">
-              {/* Large Avatar (200x200) */}
-              <Avatar className="h-48 w-48 border-4 border-primary/20">
+          <Card className="p-4 sm:p-6 lg:p-8 mb-6">
+            <div className="flex flex-col sm:flex-row gap-4 sm:gap-6 lg:gap-8">
+              {/* Avatar - Responsive size */}
+              <Avatar className="h-24 w-24 sm:h-32 sm:w-32 lg:h-48 lg:w-48 border-4 border-primary/20 mx-auto sm:mx-0">
                 <AvatarImage src={profile.avatar_url || undefined} />
-                <AvatarFallback className="text-4xl bg-primary text-primary-foreground">
+                <AvatarFallback className="text-2xl sm:text-3xl lg:text-4xl bg-primary text-primary-foreground">
                   {getInitials(profile.display_name || profile.username)}
                 </AvatarFallback>
               </Avatar>
 
-              <div className="flex-1 space-y-4">
+              <div className="flex-1 space-y-3 sm:space-y-4 text-center sm:text-left">
                 {/* Header Row */}
-                <div className="flex items-start justify-between">
-                  <div>
-                    <h1 className="text-3xl font-bold mb-1">
+                <div className="flex flex-col sm:flex-row items-center sm:items-start sm:justify-between gap-3">
+                  <div className="flex-1">
+                    <h1 className="text-2xl sm:text-3xl font-bold mb-1">
                       {profile.display_name || profile.username}
                     </h1>
-                    <p className="text-lg text-muted-foreground">@{profile.username}</p>
+                    <p className="text-base sm:text-lg text-muted-foreground">@{profile.username}</p>
                   </div>
                   {isOwnProfile ? (
                     <Button
                       variant="outline"
                       onClick={() => setEditDialogOpen(true)}
+                      className="w-full sm:w-auto"
                     >
                       <Settings className="w-4 h-4 mr-2" />
                       Edit Profile
@@ -164,16 +165,16 @@ const Profile = () => {
                 </div>
 
                 {/* Stats */}
-                <div className="flex gap-6">
+                <div className="flex gap-4 sm:gap-6 justify-center sm:justify-start">
                   <div>
-                    <span className="font-bold text-xl">{stats.posts}</span>
-                    <span className="text-muted-foreground ml-2">posts</span>
+                    <span className="font-bold text-lg sm:text-xl">{stats.posts}</span>
+                    <span className="text-sm sm:text-base text-muted-foreground ml-2">posts</span>
                   </div>
                 </div>
 
                 {/* Bio */}
                 {profile.bio && (
-                  <p className="text-foreground whitespace-pre-wrap max-w-2xl">
+                  <p className="text-sm sm:text-base text-foreground whitespace-pre-wrap max-w-2xl">
                     {profile.bio}
                   </p>
                 )}
@@ -194,29 +195,29 @@ const Profile = () => {
 
           {/* Tabs Navigation */}
           <Tabs defaultValue="front-page" className="w-full">
-            <TabsList className="w-full justify-start border-b rounded-none h-auto p-0 bg-transparent">
+            <TabsList className="w-full justify-start border-b rounded-none h-auto p-0 bg-transparent overflow-x-auto">
               <TabsTrigger
                 value="front-page"
-                className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent"
+                className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent text-sm sm:text-base whitespace-nowrap px-3 sm:px-4"
               >
                 Front Page
               </TabsTrigger>
               <TabsTrigger
                 value="posts"
-                className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent"
+                className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent text-sm sm:text-base whitespace-nowrap px-3 sm:px-4"
               >
                 Posts
               </TabsTrigger>
               <TabsTrigger
                 value="collections"
-                className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent"
+                className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent text-sm sm:text-base whitespace-nowrap px-3 sm:px-4"
               >
                 Collections
               </TabsTrigger>
             </TabsList>
 
             {/* Front Page Tab */}
-            <TabsContent value="front-page" className="mt-6">
+            <TabsContent value="front-page" className="mt-4 sm:mt-6">
               <FrontPage
                 userId={profile.id}
                 bio={profile.bio || undefined}
@@ -224,7 +225,7 @@ const Profile = () => {
             </TabsContent>
 
             {/* Posts Tab */}
-            <TabsContent value="posts" className="mt-6">
+            <TabsContent value="posts" className="mt-4 sm:mt-6">
               <PostsGrid
                 userId={profile.id}
                 isOwnProfile={isOwnProfile}
@@ -233,7 +234,7 @@ const Profile = () => {
             </TabsContent>
 
             {/* Collections Tab */}
-            <TabsContent value="collections" className="mt-6">
+            <TabsContent value="collections" className="mt-4 sm:mt-6">
               <CollectionsGrid
                 userId={profile.id}
                 isOwnProfile={isOwnProfile}

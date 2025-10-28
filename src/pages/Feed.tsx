@@ -35,9 +35,9 @@ const Feed = () => {
     <div className="min-h-screen bg-background">
       <Navbar />
 
-      <main className="container mx-auto px-4 py-8">
+      <main className="container mx-auto px-4 py-4 sm:py-8">
         <div className="max-w-2xl mx-auto">
-          <h2 className="text-3xl font-bold mb-6">Your Feed</h2>
+          <h2 className="text-2xl sm:text-3xl font-bold mb-4 sm:mb-6">Your Feed</h2>
 
           {isLoading && (
             <div className="flex justify-center py-12">
@@ -59,7 +59,7 @@ const Feed = () => {
           )}
 
           {allPosts.length > 0 && (
-            <div className="space-y-6">
+            <div className="space-y-4 sm:space-y-6">
               {allPosts.map((post: any) => (
                 <PostCard key={post.id} post={post} />
               ))}

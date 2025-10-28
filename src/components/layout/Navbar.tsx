@@ -9,15 +9,17 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { useEffect, useState } from "react";
-import { User, LogOut, Settings } from "lucide-react";
+import { User, LogOut, Settings, Menu, Home, Compass, Plus } from "lucide-react";
 
 export const Navbar = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
   const [profile, setProfile] = useState<any>(null);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   useEffect(() => {
     if (user) {
@@ -52,19 +54,24 @@ export const Navbar = () => {
       .slice(0, 2);
   };
 
+  const handleNavigation = (path: string) => {
+    navigate(path);
+    setMobileMenuOpen(false);
+  };
+
   return (
     <header className="border-b border-border bg-background sticky top-0 z-50">
       <div className="container mx-auto px-4 py-3 flex justify-between items-center">
         {/* Logo */}
         <h1
-          className="text-2xl font-bold text-primary cursor-pointer"
+          className="text-xl sm:text-2xl font-bold text-primary cursor-pointer"
           onClick={() => navigate(user ? "/feed" : "/")}
         >
           Zine
         </h1>
 
-        {/* Navigation */}
-        <nav className="flex items-center gap-4">
+        {/* Desktop Navigation */}
+        <nav className="hidden md:flex items-center gap-2 lg:gap-4">
           {user ? (
             <>
               <Button variant="ghost" onClick={() => navigate("/feed")}>
@@ -80,7 +87,7 @@ export const Navbar = () => {
               {/* User Menu */}
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" size="icon" className="rounded-full">
+                  <Button variant="ghost" size="icon" className="rounded-full h-11 w-11">
                     <Avatar className="h-8 w-8">
                       <AvatarImage src={profile?.avatar_url || undefined} />
                       <AvatarFallback className="text-xs bg-primary text-primary-foreground">
@@ -124,6 +131,131 @@ export const Navbar = () => {
             </>
           )}
         </nav>
+
+        {/* Mobile Navigation */}
+        <div className="flex md:hidden items-center gap-2">
+          {user && (
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => navigate("/create")}
+              className="h-11 w-11"
+            >
+              <Plus className="h-5 w-5" />
+            </Button>
+          )}
+
+          <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
+            <SheetTrigger asChild>
+              <Button variant="ghost" size="icon" className="h-11 w-11">
+                <Menu className="h-6 w-6" />
+              </Button>
+            </SheetTrigger>
+            <SheetContent side="right" className="w-[280px]">
+              <SheetHeader>
+                <SheetTitle>Menu</SheetTitle>
+              </SheetHeader>
+              <nav className="flex flex-col gap-2 mt-6">
+                {user ? (
+                  <>
+                    {/* Profile Card */}
+                    <div className="flex items-center gap-3 p-3 mb-4 border-b">
+                      <Avatar className="h-12 w-12">
+                        <AvatarImage src={profile?.avatar_url || undefined} />
+                        <AvatarFallback className="bg-primary text-primary-foreground">
+                          {getInitials(profile?.display_name || profile?.username || user.email || "U")}
+                        </AvatarFallback>
+                      </Avatar>
+                      <div className="flex-1 min-w-0">
+                        <p className="font-semibold truncate">
+                          {profile?.display_name || profile?.username || "User"}
+                        </p>
+                        <p className="text-sm text-muted-foreground truncate">
+                          @{profile?.username || "username"}
+                        </p>
+                      </div>
+                    </div>
+
+                    <Button 
+                      variant="ghost" 
+                      className="justify-start h-12 text-base" 
+                      onClick={() => handleNavigation("/feed")}
+                    >
+                      <Home className="mr-3 h-5 w-5" />
+                      Feed
+                    </Button>
+                    <Button 
+                      variant="ghost" 
+                      className="justify-start h-12 text-base" 
+                      onClick={() => handleNavigation("/explore")}
+                    >
+                      <Compass className="mr-3 h-5 w-5" />
+                      Explore
+                    </Button>
+                    <Button 
+                      variant="default" 
+                      className="justify-start h-12 text-base" 
+                      onClick={() => handleNavigation("/create")}
+                    >
+                      <Plus className="mr-3 h-5 w-5" />
+                      Create Post
+                    </Button>
+                    <div className="my-2 border-t" />
+                    <Button 
+                      variant="ghost" 
+                      className="justify-start h-12 text-base" 
+                      onClick={() => {
+                        if (profile?.username) {
+                          handleNavigation(`/profile/${profile.username}`);
+                        } else {
+                          toast.error("Please set your username first");
+                          handleNavigation("/settings");
+                        }
+                      }}
+                    >
+                      <User className="mr-3 h-5 w-5" />
+                      Profile
+                    </Button>
+                    <Button 
+                      variant="ghost" 
+                      className="justify-start h-12 text-base" 
+                      onClick={() => handleNavigation("/settings")}
+                    >
+                      <Settings className="mr-3 h-5 w-5" />
+                      Settings
+                    </Button>
+                    <div className="my-2 border-t" />
+                    <Button 
+                      variant="ghost" 
+                      className="justify-start h-12 text-base text-destructive" 
+                      onClick={handleLogout}
+                    >
+                      <LogOut className="mr-3 h-5 w-5" />
+                      Log Out
+                    </Button>
+                  </>
+                ) : (
+                  <>
+                    <Button 
+                      variant="ghost" 
+                      className="justify-start h-12 text-base" 
+                      onClick={() => handleNavigation("/login")}
+                    >
+                      Log In
+                    </Button>
+                    <Button 
+                      variant="default" 
+                      className="justify-start h-12 text-base" 
+                      onClick={() => handleNavigation("/signup")}
+                    >
+                      Sign Up
+                    </Button>
+                  </>
+                )}
+              </nav>
+            </SheetContent>
+          </Sheet>
+        </div>
       </div>
     </header>
   );
