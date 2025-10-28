@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, useSearchParams } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
+import { AnimatePresence } from "framer-motion";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { Navbar } from "@/components/layout/Navbar";
@@ -34,11 +35,40 @@ const Profile = () => {
   const { username } = useParams<{ username: string }>();
   const { user } = useAuth();
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const postIdParam = searchParams.get("post");
+  const [activePostId, setActivePostId] = useState<string | null>(postIdParam);
+  
   const [profile, setProfile] = useState<Profile | null>(null);
   const [stats, setStats] = useState<Stats>({ posts: 0 });
   const [loading, setLoading] = useState(true);
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [isFollowing, setIsFollowing] = useState(false);
+
+  const { adjacentPostIds } = usePostNavigation({
+    context: "profile",
+    userId: profile?.id || "",
+    currentPostId: activePostId || "",
+  });
+
+  useEffect(() => {
+    setActivePostId(postIdParam);
+  }, [postIdParam]);
+
+  const handleOpenModal = (postId: string) => {
+    setActivePostId(postId);
+    setSearchParams({ post: postId }, { replace: false });
+  };
+
+  const handleCloseModal = () => {
+    setActivePostId(null);
+    setSearchParams({}, { replace: false });
+  };
+
+  const handleNavigatePost = (postId: string) => {
+    setActivePostId(postId);
+    setSearchParams({ post: postId }, { replace: false });
+  };
 
   const isOwnProfile = user?.id === profile?.id;
 
@@ -252,10 +282,11 @@ const Profile = () => {
             {/* Posts Tab */}
             <TabsContent value="posts" className="mt-4 sm:mt-6">
               <PostsGrid
-                userId={profile.id}
-                isOwnProfile={isOwnProfile}
-                onCreateClick={() => navigate("/create")}
-              />
+                  userId={profile.id}
+                  isOwnProfile={isOwnProfile}
+                  onCreateClick={() => navigate("/create")}
+                  onOpenModal={handleOpenModal}
+                />
             </TabsContent>
 
             {/* Collections Tab */}

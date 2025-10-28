@@ -8,9 +8,10 @@ interface PostsGridProps {
   userId: string;
   isOwnProfile: boolean;
   onCreateClick: () => void;
+  onOpenModal?: (postId: string) => void;
 }
 
-export const PostsGrid = ({ userId, isOwnProfile, onCreateClick }: PostsGridProps) => {
+export const PostsGrid = ({ userId, isOwnProfile, onCreateClick, onOpenModal }: PostsGridProps) => {
   const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading } =
     useUserPosts(userId);
   const observerTarget = useRef<HTMLDivElement>(null);
@@ -69,10 +70,18 @@ export const PostsGrid = ({ userId, isOwnProfile, onCreateClick }: PostsGridProp
           )[0];
           const slideCount = post.post_images.length;
 
+          const handleClick = (e: React.MouseEvent) => {
+            if (onOpenModal) {
+              e.preventDefault();
+              onOpenModal(post.id);
+            }
+          };
+
           return (
             <Link
               key={post.id}
               to={`/post/${post.id}`}
+              onClick={handleClick}
               className="relative aspect-square bg-muted overflow-hidden group cursor-pointer"
             >
               <img

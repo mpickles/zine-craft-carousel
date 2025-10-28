@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Navbar } from "@/components/layout/Navbar";
 import { PostCard } from "@/components/feed/PostCard";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -6,12 +6,44 @@ import { Card } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useExplorePosts } from "@/hooks/useExplorePosts";
 import { TrendingUp, Clock, Shuffle } from "lucide-react";
+import { useSearchParams } from "react-router-dom";
+import { PostViewerModal } from "@/components/post/PostViewerModal";
+import { usePostNavigation } from "@/hooks/usePostNavigation";
+import { AnimatePresence } from "framer-motion";
 
 type ExploreMode = "trending" | "new" | "random";
 
 const Explore = () => {
   const [mode, setMode] = useState<ExploreMode>("trending");
+  const [searchParams, setSearchParams] = useSearchParams();
+  const postIdParam = searchParams.get("post");
+  const [activePostId, setActivePostId] = useState<string | null>(postIdParam);
+  
   const { data: posts = [], isLoading } = useExplorePosts(mode);
+
+  const { adjacentPostIds } = usePostNavigation({
+    context: "explore",
+    currentPostId: activePostId || "",
+  });
+
+  useEffect(() => {
+    setActivePostId(postIdParam);
+  }, [postIdParam]);
+
+  const handleOpenModal = (postId: string) => {
+    setActivePostId(postId);
+    setSearchParams({ post: postId }, { replace: false });
+  };
+
+  const handleCloseModal = () => {
+    setActivePostId(null);
+    setSearchParams({}, { replace: false });
+  };
+
+  const handleNavigatePost = (postId: string) => {
+    setActivePostId(postId);
+    setSearchParams({ post: postId }, { replace: false });
+  };
 
   return (
     <div className="min-h-screen bg-background">
@@ -50,7 +82,7 @@ const Explore = () => {
               ) : posts.length === 0 ? (
                 <EmptyState message="No trending posts yet" />
               ) : (
-                posts.map((post) => <PostCard key={post.id} post={post} />)
+                posts.map((post) => <PostCard key={post.id} post={post} onOpenModal={handleOpenModal} />)
               )}
             </TabsContent>
 
@@ -60,7 +92,7 @@ const Explore = () => {
               ) : posts.length === 0 ? (
                 <EmptyState message="No new posts yet" />
               ) : (
-                posts.map((post) => <PostCard key={post.id} post={post} />)
+                posts.map((post) => <PostCard key={post.id} post={post} onOpenModal={handleOpenModal} />)
               )}
             </TabsContent>
 
@@ -70,12 +102,25 @@ const Explore = () => {
               ) : posts.length === 0 ? (
                 <EmptyState message="No posts to discover yet" />
               ) : (
-                posts.map((post) => <PostCard key={post.id} post={post} />)
+                posts.map((post) => <PostCard key={post.id} post={post} onOpenModal={handleOpenModal} />)
               )}
             </TabsContent>
           </Tabs>
         </div>
       </main>
+
+      {/* Post Viewer Modal */}
+      <AnimatePresence>
+        {activePostId && (
+          <PostViewerModal
+            postId={activePostId}
+            onClose={handleCloseModal}
+            context="explore"
+            onNavigate={handleNavigatePost}
+            adjacentPostIds={adjacentPostIds}
+          />
+        )}
+      </AnimatePresence>
     </div>
   );
 };

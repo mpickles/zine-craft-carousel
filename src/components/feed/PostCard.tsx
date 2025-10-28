@@ -36,10 +36,22 @@ interface PostCardProps {
   post: Post;
 }
 
-export const PostCard = ({ post }: PostCardProps) => {
+interface PostCardPropsExtended extends PostCardProps {
+  onOpenModal?: (postId: string) => void;
+}
+
+export const PostCard = ({ post, onOpenModal }: PostCardPropsExtended) => {
   const navigate = useNavigate();
   const [currentSlide, setCurrentSlide] = useState(0);
   const images = post.post_images.sort((a, b) => a.order_index - b.order_index);
+
+  const handleCardClick = () => {
+    if (onOpenModal) {
+      onOpenModal(post.id);
+    } else {
+      navigate(`/post/${post.id}`);
+    }
+  };
 
   const handleShare = async (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -67,7 +79,7 @@ export const PostCard = ({ post }: PostCardProps) => {
   return (
     <Card 
       className="overflow-hidden cursor-pointer hover:shadow-lg transition-shadow"
-      onClick={() => navigate(`/post/${post.id}`)}
+      onClick={handleCardClick}
     >
       {/* Header */}
       <div className="flex items-center gap-3 p-4">
