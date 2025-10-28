@@ -8,7 +8,7 @@ interface PostsGridProps {
   userId: string;
   isOwnProfile: boolean;
   onCreateClick: () => void;
-  onOpenModal?: (postId: string) => void;
+  onOpenModal: (postId: string) => void;
 }
 
 export const PostsGrid = ({ userId, isOwnProfile, onCreateClick, onOpenModal }: PostsGridProps) => {
@@ -71,10 +71,8 @@ export const PostsGrid = ({ userId, isOwnProfile, onCreateClick, onOpenModal }: 
           const slideCount = post.post_images.length;
 
           const handleClick = (e: React.MouseEvent) => {
-            if (onOpenModal) {
-              e.preventDefault();
-              onOpenModal(post.id);
-            }
+            e.preventDefault();
+            onOpenModal(post.id);
           };
 
           return (

@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { OptimizedImage } from "@/components/ui/optimized-image";
 import { SaveButton } from "@/components/collections/SaveButton";
+import { LikeButton } from "@/components/post/LikeButton";
 import { formatDistanceToNow } from "date-fns";
 import { Share2 } from "lucide-react";
 import { toast } from "sonner";
@@ -97,6 +98,18 @@ export const RandomFeed = ({ posts, onOpenModal }: RandomFeedProps) => {
               )}
 
               <div className="flex gap-3 items-center">
+                <div onClick={(e) => e.stopPropagation()}>
+                  <LikeButton postId={post.id} variant="minimal" />
+                </div>
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    // Could add comment count here
+                  }}
+                  className="flex items-center gap-2 text-text-secondary hover:text-text-primary transition-colors"
+                >
+                  <span className="text-xl">💬</span>
+                </button>
                 <div onClick={(e) => e.stopPropagation()}>
                   <SaveButton postId={post.id} size="sm" />
                 </div>

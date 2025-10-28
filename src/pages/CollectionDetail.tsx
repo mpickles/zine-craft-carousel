@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useParams, useNavigate, Link } from "react-router-dom";
+import { useParams, useNavigate, Link, useSearchParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { Navbar } from "@/components/layout/Navbar";
@@ -10,6 +10,8 @@ import { toast } from "sonner";
 import { Lock, Globe, Share2, Settings, Loader2 } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 import { EditCollectionDialog } from "@/components/collections/EditCollectionDialog";
+import { PostViewerModal } from "@/components/post/PostViewerModal";
+import { AnimatePresence } from "framer-motion";
 
 interface Collection {
   id: string;
@@ -29,6 +31,7 @@ const CollectionDetail = () => {
   const { id } = useParams<{ id: string }>();
   const { user } = useAuth();
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
   const [collection, setCollection] = useState<Collection | null>(null);
   const [posts, setPosts] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -36,9 +39,19 @@ const CollectionDetail = () => {
   const [hasMore, setHasMore] = useState(true);
   const [showEditDialog, setShowEditDialog] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [selectedPostId, setSelectedPostId] = useState<string | null>(
+    searchParams.get("post")
+  );
 
   const isOwner = user?.id === collection?.user_id;
   const POSTS_PER_PAGE = 30;
+
+  const allPostIds = posts.map((p) => p.id);
+  const currentPostIndex = selectedPostId ? allPostIds.indexOf(selectedPostId) : -1;
+  const adjacentPostIds = {
+    prev: currentPostIndex > 0 ? allPostIds[currentPostIndex - 1] : null,
+    next: currentPostIndex < allPostIds.length - 1 ? allPostIds[currentPostIndex + 1] : null,
+  };
 
   useEffect(() => {
     if (id) {
@@ -295,6 +308,11 @@ const CollectionDetail = () => {
                     <Link
                       key={post.id}
                       to={`/post/${post.id}`}
+                      onClick={(e) => {
+                        e.preventDefault();
+                        setSelectedPostId(post.id);
+                        setSearchParams({ post: post.id }, { replace: false });
+                      }}
                       className="relative aspect-square bg-muted overflow-hidden group cursor-pointer"
                     >
                       <img
@@ -337,6 +355,24 @@ const CollectionDetail = () => {
           )}
         </div>
       </main>
+
+      <AnimatePresence>
+        {selectedPostId && (
+          <PostViewerModal
+            postId={selectedPostId}
+            onClose={() => {
+              setSelectedPostId(null);
+              setSearchParams({}, { replace: false });
+            }}
+            context="profile"
+            onNavigate={(postId) => {
+              setSelectedPostId(postId);
+              setSearchParams({ post: postId }, { replace: false });
+            }}
+            adjacentPostIds={adjacentPostIds}
+          />
+        )}
+      </AnimatePresence>
 
       <EditCollectionDialog
         open={showEditDialog}

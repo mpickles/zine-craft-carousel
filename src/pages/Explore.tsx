@@ -3,15 +3,16 @@ import { Navbar } from "@/components/layout/Navbar";
 import { Card } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useExplorePosts } from "@/hooks/useExplorePosts";
-import { TrendingUp, Shuffle } from "lucide-react";
+import { TrendingUp, Shuffle, FolderOpen } from "lucide-react";
 import { useSearchParams } from "react-router-dom";
 import { PostViewerModal } from "@/components/post/PostViewerModal";
 import { usePostNavigation } from "@/hooks/usePostNavigation";
 import { AnimatePresence } from "framer-motion";
 import { TrendingGrid } from "@/components/explore/TrendingGrid";
 import { RandomFeed } from "@/components/explore/RandomFeed";
+import { CollectionsBrowser } from "@/components/explore/CollectionsBrowser";
 
-type ExploreMode = "trending" | "random";
+type ExploreMode = "trending" | "random" | "collections";
 
 const Explore = () => {
   const [mode, setMode] = useState<ExploreMode>("trending");
@@ -19,7 +20,9 @@ const Explore = () => {
   const postIdParam = searchParams.get("post");
   const [activePostId, setActivePostId] = useState<string | null>(postIdParam);
   
-  const { data: posts = [], isLoading } = useExplorePosts(mode);
+  const { data: posts = [], isLoading } = useExplorePosts(
+    mode === "collections" ? "trending" : mode
+  );
 
   const { adjacentPostIds } = usePostNavigation({
     context: "explore",
@@ -84,10 +87,23 @@ const Explore = () => {
             <Shuffle className="w-4 h-4 inline-block mr-2 mb-0.5" />
             Random
           </button>
+          <button
+            onClick={() => setMode("collections")}
+            className={`pb-3 px-6 font-primary text-sm font-medium uppercase tracking-wide transition-all duration-150 ${
+              mode === "collections"
+                ? "border-b-2 border-brand-accent text-text-primary"
+                : "text-text-secondary hover:text-text-primary"
+            }`}
+          >
+            <FolderOpen className="w-4 h-4 inline-block mr-2 mb-0.5" />
+            Collections
+          </button>
         </div>
 
         {/* Content */}
-        {isLoading ? (
+        {mode === "collections" ? (
+          <CollectionsBrowser />
+        ) : isLoading ? (
           <LoadingSkeleton mode={mode} />
         ) : posts.length === 0 ? (
           <EmptyState message={mode === "trending" ? "No trending posts yet" : "No posts to discover yet"} />

@@ -17,6 +17,7 @@ import { FollowButton } from "@/components/profile/FollowButton";
 import { PostsGrid } from "@/components/profile/PostsGrid";
 import { CollectionsGrid } from "@/components/profile/CollectionsGrid";
 import { FrontPage } from "@/components/profile/FrontPage";
+import { PostViewerModal } from "@/components/post/PostViewerModal";
 import { usePostNavigation } from "@/hooks/usePostNavigation";
 
 interface Profile {
@@ -313,6 +314,20 @@ const Profile = () => {
           }}
         />
       )}
+
+      {/* Post Viewer Modal */}
+      <AnimatePresence>
+        {activePostId && (
+          <PostViewerModal
+            postId={activePostId}
+            onClose={handleCloseModal}
+            context="profile"
+            userId={profile?.id}
+            onNavigate={handleNavigatePost}
+            adjacentPostIds={adjacentPostIds}
+          />
+        )}
+      </AnimatePresence>
     </div>
   );
 };
