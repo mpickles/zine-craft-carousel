@@ -179,8 +179,8 @@ export const CarouselBuilder = ({
   return (
     <div className="flex flex-col h-screen bg-bg-primary">
       {/* Header */}
-      <header className="flex items-center justify-between px-4 py-3 border-b border-border-light bg-bg-elevated">
-        <Button variant="ghost" onClick={onCancel} aria-label="Cancel">
+      <header className="flex items-center justify-between px-6 py-4 border-b border-border-light bg-bg-elevated shadow-sm">
+        <Button variant="ghost" size="icon" onClick={onCancel} aria-label="Cancel">
           <X className="w-5 h-5" />
         </Button>
         <h1 className="text-lg font-semibold text-text-primary">New Post</h1>
@@ -189,6 +189,7 @@ export const CarouselBuilder = ({
           onClick={onNext} 
           disabled={slides.length === 0}
           aria-label="Next"
+          className="min-w-[100px]"
         >
           Next <ChevronRight className="w-4 h-4 ml-1" />
         </Button>
@@ -206,7 +207,7 @@ export const CarouselBuilder = ({
               Create Your First Slide
             </h2>
             <p className="text-text-secondary mb-6 max-w-md">
-              Tap the button below to add your first slide and start creating your carousel post
+              Upload images to start creating your carousel post
             </p>
             <Button
               variant="default"
@@ -219,80 +220,96 @@ export const CarouselBuilder = ({
           </div>
         ) : (
           <>
-            {/* Preview Area */}
-            <div className="flex-1 flex flex-col items-center justify-center p-4 bg-bg-secondary overflow-hidden">
-              <div className="w-full max-w-2xl max-h-[55vh] aspect-square bg-bg-primary rounded-lg overflow-hidden shadow-lg">
-                {currentSlide && (
-                  <img
-                    src={currentSlide.imageUrl}
-                    alt={currentSlide.altText || `Slide ${currentSlideIndex + 1}`}
-                    className="w-full h-full object-contain"
-                  />
-                )}
+            {/* Preview Area - Fixed Aspect Ratio */}
+            <div className="flex-1 flex items-center justify-center p-6 bg-bg-secondary overflow-hidden">
+              <div className="w-full max-w-md">
+                {/* Fixed 4:5 aspect ratio card */}
+                <div className="relative w-full" style={{ paddingBottom: '125%' }}>
+                  <div className="absolute inset-0 bg-bg-primary rounded-xl overflow-hidden shadow-lg border border-border-light">
+                    {currentSlide && (
+                      <img
+                        src={currentSlide.imageUrl}
+                        alt={currentSlide.altText || `Slide ${currentSlideIndex + 1}`}
+                        className="w-full h-full object-cover"
+                      />
+                    )}
+                  </div>
+                </div>
+                
+                {/* Slide Counter */}
+                <div className="mt-4 text-center">
+                  <p className="text-sm font-medium text-text-secondary">
+                    Slide {currentSlideIndex + 1} of {slides.length}
+                  </p>
+                </div>
               </div>
-              
-              {/* Slide Counter */}
-              <p className="mt-3 text-sm font-medium text-text-secondary">
-                Slide {currentSlideIndex + 1} of {slides.length}
-              </p>
             </div>
 
             {/* Action Buttons */}
-            <div className="flex items-center justify-center gap-3 py-3 px-4 border-t border-border-light bg-bg-elevated">
+            <div className="flex items-center justify-center gap-3 py-4 px-6 border-t border-border-light bg-bg-elevated">
               <Button
                 variant="outline"
-                size="sm"
+                size="default"
                 onClick={() => setEditModalOpen(true)}
                 disabled={!currentSlide}
+                className="min-w-[140px]"
               >
                 <Edit className="w-4 h-4 mr-2" />
                 Edit Image
               </Button>
               <Button
                 variant="outline"
-                size="sm"
+                size="default"
                 onClick={() => setCaptionModalOpen(true)}
                 disabled={!currentSlide}
+                className="min-w-[140px]"
               >
                 <MessageSquare className="w-4 h-4 mr-2" />
                 Add Caption
               </Button>
             </div>
 
-            {/* Bottom Tray */}
-            <div className="border-t border-border-light bg-bg-elevated p-3">
-              <div className="flex items-center gap-3 overflow-x-auto pb-2">
-                <DndContext
-                  sensors={sensors}
-                  collisionDetection={closestCenter}
-                  onDragEnd={handleDragEnd}
-                >
-                  <SortableContext
-                    items={slides.map((s) => s.id)}
-                    strategy={horizontalListSortingStrategy}
+            {/* Bottom Tray - With Proper Padding */}
+            <div className="border-t border-border-light bg-bg-elevated px-6 py-4">
+              <div className="max-w-4xl mx-auto">
+                <div className="flex items-center gap-3 overflow-x-auto pb-2">
+                  <DndContext
+                    sensors={sensors}
+                    collisionDetection={closestCenter}
+                    onDragEnd={handleDragEnd}
                   >
-                    {slides.map((slide, idx) => (
-                      <SlideThumbnail
-                        key={slide.id}
-                        slide={slide}
-                        isActive={idx === currentSlideIndex}
-                        onClick={() => onCurrentSlideChange(idx)}
-                        onRemove={() => handleRemoveSlide(slide.id)}
-                      />
-                    ))}
-                  </SortableContext>
-                </DndContext>
+                    <SortableContext
+                      items={slides.map((s) => s.id)}
+                      strategy={horizontalListSortingStrategy}
+                    >
+                      {slides.map((slide, idx) => (
+                        <SlideThumbnail
+                          key={slide.id}
+                          slide={slide}
+                          isActive={idx === currentSlideIndex}
+                          onClick={() => onCurrentSlideChange(idx)}
+                          onRemove={() => handleRemoveSlide(slide.id)}
+                        />
+                      ))}
+                    </SortableContext>
+                  </DndContext>
 
-                {/* Add Button */}
-                {slides.length < MAX_SLIDES && (
-                  <button
-                    onClick={() => fileInputRef.current?.click()}
-                    className="flex-shrink-0 w-20 h-20 rounded-lg border-2 border-dashed border-border-medium hover:border-brand-accent hover:bg-bg-secondary transition-all flex items-center justify-center"
-                    aria-label="Add more slides"
-                  >
-                    <Plus className="w-8 h-8 text-text-tertiary" />
-                  </button>
-                )}
+                  {/* Add Button */}
+                  {slides.length < MAX_SLIDES && (
+                    <button
+                      onClick={() => fileInputRef.current?.click()}
+                      className="flex-shrink-0 w-20 h-20 rounded-lg border-2 border-dashed border-border-medium hover:border-brand-accent hover:bg-bg-secondary transition-all flex items-center justify-center group"
+                      aria-label="Add more slides"
+                    >
+                      <Plus className="w-8 h-8 text-text-tertiary group-hover:text-brand-accent transition-colors" />
+                    </button>
+                  )}
+                </div>
+                
+                {/* Helper Text */}
+                <p className="text-xs text-text-tertiary text-center mt-2">
+                  Click thumbnails to edit • Drag to reorder • Max {MAX_SLIDES} slides
+                </p>
               </div>
             </div>
           </>

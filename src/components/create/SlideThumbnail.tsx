@@ -33,18 +33,18 @@ export const SlideThumbnail = ({ slide, isActive, onClick, onRemove }: SlideThum
     <div
       ref={setNodeRef}
       style={style}
-      className="relative flex-shrink-0"
+      className="relative flex-shrink-0 group"
       {...attributes}
       {...listeners}
     >
       <button
         onClick={onClick}
-        className={`relative w-20 h-20 rounded-lg overflow-hidden border-2 transition-all ${
+        className={`relative w-20 h-20 rounded-lg overflow-hidden border-2 transition-all cursor-pointer ${
           isActive 
-            ? 'border-brand-accent shadow-md' 
-            : 'border-border-light hover:border-border-medium'
+            ? 'border-brand-accent shadow-lg ring-2 ring-brand-accent/20' 
+            : 'border-border-light hover:border-brand-accent/50 hover:shadow-md'
         }`}
-        aria-label={`Select slide ${slide.order + 1}`}
+        aria-label={`Select and edit slide ${slide.order + 1}`}
       >
         <img
           src={slide.imageUrl}
@@ -52,16 +52,26 @@ export const SlideThumbnail = ({ slide, isActive, onClick, onRemove }: SlideThum
           className="w-full h-full object-cover"
         />
         
+        {/* Active indicator overlay */}
+        {isActive && (
+          <div className="absolute inset-0 bg-brand-accent/10" />
+        )}
+        
         {/* Caption indicator */}
         {hasCaption && (
-          <div className="absolute bottom-1 right-1 bg-success rounded-full p-0.5">
+          <div className="absolute bottom-1 right-1 bg-success rounded-full p-0.5 shadow-sm">
             <Check className="w-3 h-3 text-white" />
           </div>
         )}
         
         {/* Slide number */}
-        <div className="absolute top-1 left-1 bg-black/60 text-white text-xs px-1.5 py-0.5 rounded">
+        <div className="absolute top-1 left-1 bg-black/70 text-white text-xs px-1.5 py-0.5 rounded font-medium">
           {slide.order + 1}
+        </div>
+        
+        {/* Click hint overlay on hover */}
+        <div className={`absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center ${isActive ? 'hidden' : ''}`}>
+          <span className="text-white text-xs font-medium">Edit</span>
         </div>
       </button>
 
@@ -69,7 +79,7 @@ export const SlideThumbnail = ({ slide, isActive, onClick, onRemove }: SlideThum
       <Button
         variant="destructive"
         size="icon"
-        className="absolute -top-2 -right-2 w-6 h-6 rounded-full shadow-md"
+        className="absolute -top-2 -right-2 w-6 h-6 rounded-full shadow-md opacity-0 group-hover:opacity-100 transition-opacity"
         onClick={(e) => {
           e.stopPropagation();
           onRemove();
