@@ -7,10 +7,13 @@ import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Card } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "sonner";
-import { Settings, Grid, FolderOpen } from "lucide-react";
+import { Settings, ExternalLink } from "lucide-react";
 import { EditProfileDialog } from "@/components/profile/EditProfileDialog";
 import { FollowButton } from "@/components/profile/FollowButton";
+import { PostsGrid } from "@/components/profile/PostsGrid";
+import { CollectionsGrid } from "@/components/profile/CollectionsGrid";
 
 interface Profile {
   id: string;
@@ -23,8 +26,6 @@ interface Profile {
 
 interface Stats {
   posts: number;
-  followers: number;
-  following: number;
 }
 
 const Profile = () => {
@@ -32,7 +33,7 @@ const Profile = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
   const [profile, setProfile] = useState<Profile | null>(null);
-  const [stats, setStats] = useState<Stats>({ posts: 0, followers: 0, following: 0 });
+  const [stats, setStats] = useState<Stats>({ posts: 0 });
   const [loading, setLoading] = useState(true);
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [isFollowing, setIsFollowing] = useState(false);
@@ -64,37 +65,27 @@ const Profile = () => {
 
       setProfile(profileData);
 
-      // Fetch stats
-      const [postsCount, followersCount, followingCount, followStatus] = await Promise.all([
-        supabase
-          .from("posts")
-          .select("id", { count: "exact", head: true })
-          .eq("user_id", profileData.id),
-        supabase
-          .from("follows")
-          .select("follower_id", { count: "exact", head: true })
-          .eq("following_id", profileData.id),
-        supabase
-          .from("follows")
-          .select("following_id", { count: "exact", head: true })
-          .eq("follower_id", profileData.id),
-        user
-          ? supabase
-              .from("follows")
-              .select("follower_id")
-              .eq("follower_id", user.id)
-              .eq("following_id", profileData.id)
-              .maybeSingle()
-          : Promise.resolve({ data: null }),
-      ]);
+      // Fetch post count
+      const { count: postsCount } = await supabase
+        .from("posts")
+        .select("id", { count: "exact", head: true })
+        .eq("user_id", profileData.id);
 
       setStats({
-        posts: postsCount.count || 0,
-        followers: followersCount.count || 0,
-        following: followingCount.count || 0,
+        posts: postsCount || 0,
       });
 
-      setIsFollowing(!!followStatus.data);
+      // Check follow status if viewing another profile
+      if (user && user.id !== profileData.id) {
+        const { data: followStatus } = await supabase
+          .from("follows")
+          .select("follower_id")
+          .eq("follower_id", user.id)
+          .eq("following_id", profileData.id)
+          .maybeSingle();
+
+        setIsFollowing(!!followStatus);
+      }
     } catch (error: any) {
       toast.error("Failed to load profile");
       console.error(error);
@@ -108,9 +99,9 @@ const Profile = () => {
       <div className="min-h-screen bg-background">
         <Navbar />
         <main className="container mx-auto px-4 py-8">
-          <div className="max-w-4xl mx-auto space-y-6">
-            <Skeleton className="h-32 w-full" />
-            <Skeleton className="h-64 w-full" />
+          <div className="max-w-5xl mx-auto space-y-6">
+            <Skeleton className="h-48 w-full" />
+            <Skeleton className="h-96 w-full" />
           </div>
         </main>
       </div>
@@ -133,29 +124,30 @@ const Profile = () => {
       <Navbar />
 
       <main className="container mx-auto px-4 py-8">
-        <div className="max-w-4xl mx-auto">
+        <div className="max-w-5xl mx-auto">
           {/* Profile Header */}
-          <Card className="p-6 mb-6">
-            <div className="flex flex-col md:flex-row gap-6">
-              <Avatar className="h-32 w-32 border-4 border-primary/20">
+          <Card className="p-8 mb-6">
+            <div className="flex flex-col md:flex-row gap-8">
+              {/* Large Avatar (200x200) */}
+              <Avatar className="h-48 w-48 border-4 border-primary/20">
                 <AvatarImage src={profile.avatar_url || undefined} />
-                <AvatarFallback className="text-2xl bg-primary text-primary-foreground">
+                <AvatarFallback className="text-4xl bg-primary text-primary-foreground">
                   {getInitials(profile.display_name || profile.username)}
                 </AvatarFallback>
               </Avatar>
 
-              <div className="flex-1">
-                <div className="flex items-start justify-between mb-4">
+              <div className="flex-1 space-y-4">
+                {/* Header Row */}
+                <div className="flex items-start justify-between">
                   <div>
-                    <h2 className="text-2xl font-bold">
+                    <h1 className="text-3xl font-bold mb-1">
                       {profile.display_name || profile.username}
-                    </h2>
-                    <p className="text-muted-foreground">@{profile.username}</p>
+                    </h1>
+                    <p className="text-lg text-muted-foreground">@{profile.username}</p>
                   </div>
                   {isOwnProfile ? (
                     <Button
                       variant="outline"
-                      size="sm"
                       onClick={() => setEditDialogOpen(true)}
                     >
                       <Settings className="w-4 h-4 mr-2" />
@@ -165,71 +157,75 @@ const Profile = () => {
                     <FollowButton
                       profileId={profile.id}
                       isFollowing={isFollowing}
-                      onFollowChange={(following) => {
-                        setIsFollowing(following);
-                        setStats((prev) => ({
-                          ...prev,
-                          followers: following ? prev.followers + 1 : prev.followers - 1,
-                        }));
-                      }}
+                      onFollowChange={setIsFollowing}
                     />
                   )}
                 </div>
 
                 {/* Stats */}
-                <div className="flex gap-6 mb-4">
-                  <div className="text-center">
-                    <div className="font-bold text-xl">{stats.posts}</div>
-                    <div className="text-sm text-muted-foreground">posts</div>
-                  </div>
-                  <div className="text-center cursor-pointer hover:text-primary">
-                    <div className="font-bold text-xl">{stats.followers}</div>
-                    <div className="text-sm text-muted-foreground">followers</div>
-                  </div>
-                  <div className="text-center cursor-pointer hover:text-primary">
-                    <div className="font-bold text-xl">{stats.following}</div>
-                    <div className="text-sm text-muted-foreground">following</div>
+                <div className="flex gap-6">
+                  <div>
+                    <span className="font-bold text-xl">{stats.posts}</span>
+                    <span className="text-muted-foreground ml-2">posts</span>
                   </div>
                 </div>
 
                 {/* Bio */}
                 {profile.bio && (
-                  <p className="text-foreground whitespace-pre-wrap">{profile.bio}</p>
+                  <p className="text-foreground whitespace-pre-wrap max-w-2xl">
+                    {profile.bio}
+                  </p>
                 )}
+
+                {/* Links (placeholder - will be implemented when we add links to DB) */}
+                <div className="flex flex-wrap gap-2">
+                  {/* Example link */}
+                  {/* <Button variant="outline" size="sm" asChild>
+                    <a href="https://example.com" target="_blank" rel="noopener noreferrer">
+                      <ExternalLink className="w-3 h-3 mr-1" />
+                      Website
+                    </a>
+                  </Button> */}
+                </div>
               </div>
             </div>
           </Card>
 
-          {/* Tabs */}
-          <div className="border-b border-border mb-6">
-            <div className="flex gap-8">
-              <button className="pb-3 border-b-2 border-primary text-primary font-medium flex items-center gap-2">
-                <Grid className="w-4 h-4" />
+          {/* Tabs Navigation */}
+          <Tabs defaultValue="posts" className="w-full">
+            <TabsList className="w-full justify-start border-b rounded-none h-auto p-0 bg-transparent">
+              <TabsTrigger
+                value="posts"
+                className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent"
+              >
                 Posts
-              </button>
-              <button className="pb-3 text-muted-foreground hover:text-foreground flex items-center gap-2">
-                <FolderOpen className="w-4 h-4" />
+              </TabsTrigger>
+              <TabsTrigger
+                value="collections"
+                className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent"
+              >
                 Collections
-              </button>
-            </div>
-          </div>
+              </TabsTrigger>
+            </TabsList>
 
-          {/* Posts Grid */}
-          <div className="grid grid-cols-3 gap-4">
-            {stats.posts === 0 ? (
-              <div className="col-span-3 text-center py-12">
-                <p className="text-muted-foreground mb-4">No posts yet</p>
-                {isOwnProfile && (
-                  <Button onClick={() => navigate("/create")}>Create your first post</Button>
-                )}
-              </div>
-            ) : (
-              // Placeholder for future posts
-              <div className="col-span-3 text-center py-12 text-muted-foreground">
-                Posts grid coming soon...
-              </div>
-            )}
-          </div>
+            {/* Posts Tab */}
+            <TabsContent value="posts" className="mt-6">
+              <PostsGrid
+                userId={profile.id}
+                isOwnProfile={isOwnProfile}
+                onCreateClick={() => navigate("/create")}
+              />
+            </TabsContent>
+
+            {/* Collections Tab */}
+            <TabsContent value="collections" className="mt-6">
+              <CollectionsGrid
+                userId={profile.id}
+                isOwnProfile={isOwnProfile}
+                onCreateClick={() => toast.info("Collections feature coming soon!")}
+              />
+            </TabsContent>
+          </Tabs>
         </div>
       </main>
 

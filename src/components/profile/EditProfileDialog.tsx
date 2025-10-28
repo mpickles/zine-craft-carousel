@@ -13,7 +13,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { toast } from "sonner";
-import { Upload } from "lucide-react";
+import { Upload, X, Link as LinkIcon } from "lucide-react";
 
 interface Profile {
   id: string;
@@ -22,6 +22,11 @@ interface Profile {
   bio: string | null;
   avatar_url: string | null;
   is_private: boolean;
+}
+
+interface ProfileLink {
+  label: string;
+  url: string;
 }
 
 interface EditProfileDialogProps {
@@ -40,8 +45,25 @@ export const EditProfileDialog = ({
   const [displayName, setDisplayName] = useState(profile.display_name || "");
   const [bio, setBio] = useState(profile.bio || "");
   const [avatarUrl, setAvatarUrl] = useState(profile.avatar_url || "");
+  const [links, setLinks] = useState<ProfileLink[]>([{ label: "", url: "" }]);
   const [uploading, setUploading] = useState(false);
   const [saving, setSaving] = useState(false);
+
+  const addLink = () => {
+    if (links.length < 5) {
+      setLinks([...links, { label: "", url: "" }]);
+    }
+  };
+
+  const removeLink = (index: number) => {
+    setLinks(links.filter((_, i) => i !== index));
+  };
+
+  const updateLink = (index: number, field: "label" | "url", value: string) => {
+    const newLinks = [...links];
+    newLinks[index][field] = value;
+    setLinks(newLinks);
+  };
 
   const handleAvatarUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -75,7 +97,9 @@ export const EditProfileDialog = ({
         .from("posts")
         .getPublicUrl(filePath);
 
-      setAvatarUrl(publicUrl);
+      // Generate optimized avatar URL (200x200)
+      const optimizedUrl = `${publicUrl}?width=200&height=200&quality=80&format=webp`;
+      setAvatarUrl(optimizedUrl);
       toast.success("Avatar uploaded!");
     } catch (error: any) {
       toast.error(error.message || "Failed to upload avatar");
@@ -193,6 +217,48 @@ export const EditProfileDialog = ({
             <p className="text-xs text-muted-foreground text-right">
               {bio.length}/500
             </p>
+          </div>
+
+          {/* Links */}
+          <div className="space-y-3">
+            <div className="flex items-center justify-between">
+              <Label>Links (up to 5)</Label>
+              {links.length < 5 && (
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  onClick={addLink}
+                >
+                  <LinkIcon className="w-4 h-4 mr-1" />
+                  Add Link
+                </Button>
+              )}
+            </div>
+            {links.map((link, index) => (
+              <div key={index} className="flex gap-2">
+                <Input
+                  placeholder="Label"
+                  value={link.label}
+                  onChange={(e) => updateLink(index, "label", e.target.value)}
+                  maxLength={20}
+                />
+                <Input
+                  placeholder="https://..."
+                  value={link.url}
+                  onChange={(e) => updateLink(index, "url", e.target.value)}
+                  type="url"
+                />
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => removeLink(index)}
+                >
+                  <X className="w-4 h-4" />
+                </Button>
+              </div>
+            ))}
           </div>
 
           {/* Username (read-only) */}

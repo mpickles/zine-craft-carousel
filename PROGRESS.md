@@ -403,7 +403,48 @@ All tables have appropriate indexes for frequently queried columns:
 - ✅ Optimized thumbnail images (400x400) for feed previews
 - ✅ Intersection Observer for infinite scroll trigger
 
----
+### User Profile System
+
+**Profile Header:**
+- ✅ Large avatar (200x200 with optimization)
+- ✅ Username and display name
+- ✅ Bio (max 500 chars)
+- ✅ Link list support (up to 5 external links) in edit dialog
+- ✅ Post count display
+- ✅ [Edit Profile] button (if own profile)
+- ✅ [Follow] button (if viewing others)
+
+**Tab Navigation:**
+- ✅ Posts tab (3-column grid)
+- ✅ Collections tab (grid of collections)
+- ✅ Smooth tab transitions
+
+**Posts Tab:**
+- ✅ 3-column responsive grid
+- ✅ First slide thumbnail preview
+- ✅ Slide count indicator
+- ✅ Sorted by newest first
+- ✅ Infinite scroll (12 posts per page)
+- ✅ Empty state: "No posts yet" + [Create] button
+- ✅ Lazy loading images
+
+**Collections Tab:**
+- ✅ Grid of collection cards
+- ✅ Cover image, name, post count
+- ✅ Public/private icon
+- ✅ Click → collection detail link
+- ✅ [+ New Collection] button (if own profile)
+- ✅ Empty state with create prompt
+
+**Settings Page:**
+- ✅ Edit avatar with 200x200 optimization
+- ✅ Edit username, display name, bio, links
+- ✅ Privacy: Public/Private profile toggle
+- ✅ Default post privacy toggle
+- ✅ Change email with confirmation
+- ✅ Change password (min 8 chars)
+- ✅ [Export My Data] button (downloads JSON)
+- ✅ [Delete Account] button with confirmation dialog
 
 ## ✅ Completed (Phase 3: Post Viewer)
 
