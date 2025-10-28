@@ -162,11 +162,22 @@ export const CarouselBuilder = ({
     });
   };
 
-  const handleSaveEdits = (edits: ImageEdits) => {
-    const updatedSlides = slides.map((slide, idx) =>
-      idx === currentSlideIndex ? { ...slide, edits } : slide
-    );
-    onSlidesChange(updatedSlides);
+  const handleSaveEdits = (edits: ImageEdits, applyToAll?: boolean) => {
+    if (applyToAll) {
+      // Apply filter to all slides
+      const updatedSlides = slides.map((slide) => ({ ...slide, edits: { ...slide.edits, filter: edits.filter } }));
+      onSlidesChange(updatedSlides);
+      toast({
+        title: 'Filter applied',
+        description: `Filter applied to all ${slides.length} slides`,
+      });
+    } else {
+      // Apply edits to current slide only
+      const updatedSlides = slides.map((slide, idx) =>
+        idx === currentSlideIndex ? { ...slide, edits } : slide
+      );
+      onSlidesChange(updatedSlides);
+    }
   };
 
   const handleSaveCaption = (caption: string, altText: string) => {
@@ -334,6 +345,7 @@ export const CarouselBuilder = ({
             onSave={handleSaveEdits}
             imageUrl={currentSlide.imageUrl}
             initialEdits={currentSlide.edits}
+            slideCount={slides.length}
           />
           <CaptionModal
             isOpen={captionModalOpen}

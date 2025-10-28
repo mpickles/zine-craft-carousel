@@ -4,7 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { CarouselBuilder } from "@/components/create/CarouselBuilder";
 import { PublishPage } from "@/components/create/PublishPage";
-import type { Slide, PostDraft } from "@/types/post";
+import type { Slide, PostDraft, TaggedUser } from "@/types/post";
 import {
   Dialog,
   DialogContent,
@@ -28,6 +28,8 @@ export const CreatePost = () => {
   const [tags, setTags] = useState<string[]>([]);
   const [isAIGenerated, setIsAIGenerated] = useState(false);
   const [visibility, setVisibility] = useState<'public' | 'followers'>('public');
+  const [location, setLocation] = useState('');
+  const [taggedUsers, setTaggedUsers] = useState<TaggedUser[]>([]);
   const [isPublishing, setIsPublishing] = useState(false);
   
   // Modal state
@@ -41,10 +43,12 @@ export const CreatePost = () => {
   const saveDraft = () => {
     // Don't save imageFile (File objects can't be serialized)
     // Only save metadata - images will be lost on page refresh
-    const draftMetadata = {
+    const draftMetadata: PostDraft = {
       tags,
       isAIGenerated,
       visibility,
+      location,
+      taggedUsers,
       lastSaved: Date.now(),
     };
     localStorage.setItem(DRAFT_KEY, JSON.stringify(draftMetadata));
@@ -70,17 +74,19 @@ export const CreatePost = () => {
     
     const interval = setInterval(saveDraft, 30000);
     return () => clearInterval(interval);
-  }, [slides, currentSlideIndex, tags, isAIGenerated, visibility]);
+  }, [slides, currentSlideIndex, tags, isAIGenerated, visibility, location, taggedUsers]);
   
   // Load draft metadata on mount (images can't be persisted)
   useEffect(() => {
     const draft = loadDraft();
     if (draft) {
-      // Only restore metadata (tags, settings)
+      // Only restore metadata (tags, settings, location, tagged users)
       // Images are lost on page refresh - that's expected behavior
       if (draft.tags) setTags(draft.tags);
       if (draft.isAIGenerated !== undefined) setIsAIGenerated(draft.isAIGenerated);
       if (draft.visibility) setVisibility(draft.visibility);
+      if (draft.location) setLocation(draft.location);
+      if (draft.taggedUsers) setTaggedUsers(draft.taggedUsers);
     }
   }, []);
 
@@ -133,6 +139,8 @@ export const CreatePost = () => {
           caption: uploadedSlides[0].caption,
           is_private: visibility === 'followers',
           is_ai_generated: isAIGenerated,
+          location: location.trim() || null,
+          aspect_ratio: uploadedSlides[0].aspectRatio || '1:1',
         })
         .select()
         .single();
@@ -148,6 +156,7 @@ export const CreatePost = () => {
         alt_text: slide.altText,
         order_index: slide.order,
         template: 'image-full', // Default template for new carousel posts
+        aspect_ratio: slide.aspectRatio || '1:1',
       }));
 
       const { error: imagesError } = await supabase
@@ -155,6 +164,20 @@ export const CreatePost = () => {
         .insert(imageRecords);
 
       if (imagesError) throw imagesError;
+
+      // Insert tagged users if any
+      if (taggedUsers.length > 0) {
+        const taggedUserRecords = taggedUsers.map((user) => ({
+          post_id: post.id,
+          user_id: user.id,
+        }));
+
+        const { error: taggedUsersError } = await supabase
+          .from("post_tagged_users")
+          .insert(taggedUserRecords);
+
+        if (taggedUsersError) console.error("Error tagging users:", taggedUsersError);
+      }
 
       // Clear draft
       clearDraft();
@@ -211,9 +234,13 @@ export const CreatePost = () => {
           tags={tags}
           isAIGenerated={isAIGenerated}
           visibility={visibility}
+          location={location}
+          taggedUsers={taggedUsers}
           onTagsChange={setTags}
           onAIGeneratedChange={setIsAIGenerated}
           onVisibilityChange={setVisibility}
+          onLocationChange={setLocation}
+          onTaggedUsersChange={setTaggedUsers}
           onBack={() => setCurrentPage('builder')}
           onPublish={handlePublish}
           isPublishing={isPublishing}

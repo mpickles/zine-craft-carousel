@@ -28,6 +28,8 @@ export const SlideThumbnail = ({ slide, isActive, onClick, onRemove }: SlideThum
   };
 
   const hasCaption = slide.caption.trim().length > 0;
+  const hasAltText = slide.altText.trim().length > 0;
+  const isMissingAltText = !hasAltText;
 
   return (
     <div
@@ -57,12 +59,22 @@ export const SlideThumbnail = ({ slide, isActive, onClick, onRemove }: SlideThum
           <div className="absolute inset-0 bg-brand-accent/10" />
         )}
         
-        {/* Caption indicator */}
-        {hasCaption && (
-          <div className="absolute bottom-1 right-1 bg-success rounded-full p-0.5 shadow-sm">
-            <Check className="w-3 h-3 text-white" />
-          </div>
-        )}
+        {/* Status Badges */}
+        <div className="absolute top-1 right-1 flex flex-col gap-1">
+          {/* Caption + Alt Text Check */}
+          {hasCaption && hasAltText && (
+            <div className="bg-success rounded-full p-0.5 shadow-sm">
+              <Check className="w-3 h-3 text-white" />
+            </div>
+          )}
+          
+          {/* Missing Alt Text Warning (Instagram 2025 Standard) */}
+          {isMissingAltText && (
+            <div className="bg-error rounded-full p-0.5 shadow-sm" title="Alt text required">
+              <span className="text-white text-xs font-bold leading-none">!</span>
+            </div>
+          )}
+        </div>
         
         {/* Slide number */}
         <div className="absolute top-1 left-1 bg-black/70 text-white text-xs px-1.5 py-0.5 rounded font-medium">

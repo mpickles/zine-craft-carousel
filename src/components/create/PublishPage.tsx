@@ -1,7 +1,8 @@
 import { useState } from 'react';
-import { ChevronLeft, Check, Tag } from 'lucide-react';
+import { ChevronLeft, Check, Tag, MapPin, User, X as XIcon } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
+import { Input } from '@/components/ui/input';
 import { Checkbox } from '@/components/ui/checkbox';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import {
@@ -12,18 +13,23 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
-import type { Slide } from '@/types/post';
-import { AVAILABLE_TAGS, MAX_TAGS } from '@/types/post';
+import type { Slide, TaggedUser } from '@/types/post';
+import { AVAILABLE_TAGS, MAX_TAGS, MAX_TAGGED_USERS, MAX_LOCATION_LENGTH } from '@/types/post';
 import { useToast } from '@/hooks/use-toast';
+import { supabase } from '@/integrations/supabase/client';
 
 interface PublishPageProps {
   slides: Slide[];
   tags: string[];
   isAIGenerated: boolean;
   visibility: 'public' | 'followers';
+  location: string;
+  taggedUsers: TaggedUser[];
   onTagsChange: (tags: string[]) => void;
   onAIGeneratedChange: (value: boolean) => void;
   onVisibilityChange: (value: 'public' | 'followers') => void;
+  onLocationChange: (location: string) => void;
+  onTaggedUsersChange: (users: TaggedUser[]) => void;
   onBack: () => void;
   onPublish: () => void;
   isPublishing: boolean;
@@ -34,15 +40,21 @@ export const PublishPage = ({
   tags,
   isAIGenerated,
   visibility,
+  location,
+  taggedUsers,
   onTagsChange,
   onAIGeneratedChange,
   onVisibilityChange,
+  onLocationChange,
+  onTaggedUsersChange,
   onBack,
   onPublish,
   isPublishing,
 }: PublishPageProps) => {
   const { toast } = useToast();
   const [tagSelectOpen, setTagSelectOpen] = useState(false);
+  const [userSearchQuery, setUserSearchQuery] = useState('');
+  const [userSearchResults, setUserSearchResults] = useState<TaggedUser[]>([]);
 
   const handleAddTag = (tag: string) => {
     if (tags.length >= MAX_TAGS) {
@@ -64,6 +76,56 @@ export const PublishPage = ({
     onTagsChange(tags.filter((t) => t !== tag));
   };
 
+  const handleSearchUsers = async (query: string) => {
+    setUserSearchQuery(query);
+    if (query.trim().length < 2) {
+      setUserSearchResults([]);
+      return;
+    }
+
+    try {
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('id, username, avatar_url')
+        .ilike('username', `%${query}%`)
+        .limit(5);
+
+      if (error) throw error;
+      setUserSearchResults(data || []);
+    } catch (error) {
+      console.error('Error searching users:', error);
+      setUserSearchResults([]);
+    }
+  };
+
+  const handleAddTaggedUser = (user: TaggedUser) => {
+    if (taggedUsers.length >= MAX_TAGGED_USERS) {
+      toast({
+        title: 'Tag limit reached',
+        description: `Maximum ${MAX_TAGGED_USERS} people can be tagged`,
+        variant: 'destructive',
+      });
+      return;
+    }
+
+    if (taggedUsers.find((u) => u.id === user.id)) {
+      toast({
+        title: 'Already tagged',
+        description: `@${user.username} is already tagged`,
+        variant: 'destructive',
+      });
+      return;
+    }
+
+    onTaggedUsersChange([...taggedUsers, user]);
+    setUserSearchQuery('');
+    setUserSearchResults([]);
+  };
+
+  const handleRemoveTaggedUser = (userId: string) => {
+    onTaggedUsersChange(taggedUsers.filter((u) => u.id !== userId));
+  };
+
   const handlePublishClick = () => {
     // Validation
     if (slides.length === 0) {
@@ -79,6 +141,17 @@ export const PublishPage = ({
       toast({
         title: 'Caption required',
         description: 'Please add a caption to your first slide - this is what people see in their feed',
+        variant: 'destructive',
+      });
+      return;
+    }
+
+    // Check for missing alt text (Instagram 2025 standard)
+    const slidesWithoutAltText = slides.filter((s) => !s.altText.trim());
+    if (slidesWithoutAltText.length > 0) {
+      toast({
+        title: 'Alt text required',
+        description: `Please add alt text to all ${slidesWithoutAltText.length} slide(s) for accessibility`,
         variant: 'destructive',
       });
       return;
@@ -151,6 +224,98 @@ export const PublishPage = ({
 
             {tags.length >= MAX_TAGS && (
               <p className="text-sm text-text-tertiary">Max {MAX_TAGS} tags reached</p>
+            )}
+          </section>
+
+          {/* Location Section - Instagram 2025 Feature */}
+          <section className="space-y-3">
+            <Label htmlFor="location" className="text-base font-semibold flex items-center gap-2">
+              <MapPin className="w-4 h-4" />
+              Location (optional)
+            </Label>
+            <Input
+              id="location"
+              type="text"
+              placeholder="Add location..."
+              value={location}
+              onChange={(e) => onLocationChange(e.target.value.slice(0, MAX_LOCATION_LENGTH))}
+              maxLength={MAX_LOCATION_LENGTH}
+              className="w-full"
+            />
+            <p className="text-xs text-text-tertiary">
+              {location.length}/{MAX_LOCATION_LENGTH} characters
+            </p>
+          </section>
+
+          {/* Tag People Section - Instagram 2025 Feature */}
+          <section className="space-y-3">
+            <Label htmlFor="tag-people" className="text-base font-semibold flex items-center gap-2">
+              <User className="w-4 h-4" />
+              Tag People (optional)
+            </Label>
+            
+            {/* Tagged Users Display */}
+            {taggedUsers.length > 0 && (
+              <div className="flex flex-wrap gap-2 mb-2">
+                {taggedUsers.map((user) => (
+                  <Badge
+                    key={user.id}
+                    variant="secondary"
+                    className="px-3 py-1 flex items-center gap-2"
+                  >
+                    <span>@{user.username}</span>
+                    <button
+                      onClick={() => handleRemoveTaggedUser(user.id)}
+                      className="hover:text-error"
+                      aria-label={`Remove @${user.username}`}
+                    >
+                      <XIcon className="w-3 h-3" />
+                    </button>
+                  </Badge>
+                ))}
+              </div>
+            )}
+
+            {/* User Search Input */}
+            {taggedUsers.length < MAX_TAGGED_USERS && (
+              <div className="relative">
+                <Input
+                  id="tag-people"
+                  type="text"
+                  placeholder="Search username..."
+                  value={userSearchQuery}
+                  onChange={(e) => handleSearchUsers(e.target.value)}
+                  className="w-full"
+                />
+                
+                {/* Search Results Dropdown */}
+                {userSearchResults.length > 0 && (
+                  <div className="absolute top-full left-0 right-0 mt-1 bg-bg-elevated border border-border-light rounded-lg shadow-lg max-h-48 overflow-y-auto z-10">
+                    {userSearchResults.map((user) => (
+                      <button
+                        key={user.id}
+                        onClick={() => handleAddTaggedUser(user)}
+                        className="w-full flex items-center gap-3 px-3 py-2 hover:bg-bg-secondary transition-colors text-left"
+                      >
+                        <div className="w-8 h-8 rounded-full bg-bg-tertiary flex items-center justify-center overflow-hidden">
+                          {user.avatar_url ? (
+                            <img src={user.avatar_url} alt={user.username} className="w-full h-full object-cover" />
+                          ) : (
+                            <User className="w-4 h-4 text-text-tertiary" />
+                          )}
+                        </div>
+                        <span className="font-medium">@{user.username}</span>
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
+
+            {taggedUsers.length >= MAX_TAGGED_USERS && (
+              <p className="text-sm text-text-tertiary">
+                Max {MAX_TAGGED_USERS} people can be tagged
+              </p>
             )}
           </section>
 

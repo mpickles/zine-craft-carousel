@@ -9,9 +9,10 @@ import type { ImageEdits } from '@/types/post';
 interface ImageEditModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSave: (edits: ImageEdits) => void;
+  onSave: (edits: ImageEdits, applyToAll?: boolean) => void;
   imageUrl: string;
   initialEdits: ImageEdits;
+  slideCount: number;
 }
 
 const ASPECT_RATIOS = [
@@ -28,12 +29,13 @@ const FILTERS = [
   { label: 'Vibrant', value: 'vibrant' as const, style: 'saturate(150%) contrast(110%)' },
 ];
 
-export const ImageEditModal = ({ isOpen, onClose, onSave, imageUrl, initialEdits }: ImageEditModalProps) => {
+export const ImageEditModal = ({ isOpen, onClose, onSave, imageUrl, initialEdits, slideCount }: ImageEditModalProps) => {
   const [edits, setEdits] = useState<ImageEdits>(initialEdits);
   const [crop, setCrop] = useState({ x: 0, y: 0 });
   const [zoom, setZoom] = useState(1);
   const [croppedAreaPixels, setCroppedAreaPixels] = useState(null);
   const [activeTab, setActiveTab] = useState<'crop' | 'rotate' | 'filter' | 'adjust'>('crop');
+  const [applyFilterToAll, setApplyFilterToAll] = useState(false);
 
   const onCropComplete = useCallback((croppedArea: any, croppedAreaPixels: any) => {
     setCroppedAreaPixels(croppedAreaPixels);
@@ -93,7 +95,7 @@ export const ImageEditModal = ({ isOpen, onClose, onSave, imageUrl, initialEdits
   };
 
   const handleSave = () => {
-    onSave(edits);
+    onSave(edits, activeTab === 'filter' && applyFilterToAll);
     onClose();
   };
 
@@ -213,17 +215,38 @@ export const ImageEditModal = ({ isOpen, onClose, onSave, imageUrl, initialEdits
 
           {/* Filter Tools */}
           {activeTab === 'filter' && (
-            <div className="flex gap-2 flex-wrap">
-              {FILTERS.map((filter) => (
-                <Button
-                  key={filter.value}
-                  variant={edits.filter === filter.value ? 'default' : 'outline'}
-                  size="sm"
-                  onClick={() => handleFilterChange(filter.value)}
-                >
-                  {filter.label}
-                </Button>
-              ))}
+            <div className="space-y-4">
+              <div className="flex gap-2 flex-wrap">
+                {FILTERS.map((filter) => (
+                  <Button
+                    key={filter.value}
+                    variant={edits.filter === filter.value ? 'default' : 'outline'}
+                    size="sm"
+                    onClick={() => handleFilterChange(filter.value)}
+                  >
+                    {filter.label}
+                  </Button>
+                ))}
+              </div>
+              
+              {/* Apply to All Slides - Instagram 2025 Feature */}
+              {slideCount > 1 && (
+                <div className="flex items-start gap-3 p-3 bg-bg-secondary rounded-lg">
+                  <input
+                    type="checkbox"
+                    id="apply-filter-all"
+                    checked={applyFilterToAll}
+                    onChange={(e) => setApplyFilterToAll(e.target.checked)}
+                    className="mt-1"
+                  />
+                  <Label htmlFor="apply-filter-all" className="cursor-pointer">
+                    <div className="font-medium">Apply this filter to all {slideCount} slides</div>
+                    <div className="text-xs text-text-tertiary mt-1">
+                      Save time by applying the same filter to your entire carousel
+                    </div>
+                  </Label>
+                </div>
+              )}
             </div>
           )}
 

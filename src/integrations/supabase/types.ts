@@ -295,6 +295,7 @@ export type Database = {
       post_images: {
         Row: {
           alt_text: string | null
+          aspect_ratio: string | null
           caption: string | null
           created_at: string | null
           id: string
@@ -306,6 +307,7 @@ export type Database = {
         }
         Insert: {
           alt_text?: string | null
+          aspect_ratio?: string | null
           caption?: string | null
           created_at?: string | null
           id?: string
@@ -317,6 +319,7 @@ export type Database = {
         }
         Update: {
           alt_text?: string | null
+          aspect_ratio?: string | null
           caption?: string | null
           created_at?: string | null
           id?: string
@@ -336,14 +339,49 @@ export type Database = {
           },
         ]
       }
+      post_tagged_users: {
+        Row: {
+          created_at: string | null
+          post_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          post_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          post_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "post_tagged_users_post_id_fkey"
+            columns: ["post_id"]
+            isOneToOne: false
+            referencedRelation: "posts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "post_tagged_users_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       posts: {
         Row: {
+          aspect_ratio: string | null
           caption: string | null
           created_at: string | null
           id: string
           is_ai_generated: boolean | null
           is_private: boolean | null
           is_removed: boolean | null
+          location: string | null
           removed_at: string | null
           removed_reason: string | null
           updated_at: string | null
@@ -351,12 +389,14 @@ export type Database = {
           view_count: number | null
         }
         Insert: {
+          aspect_ratio?: string | null
           caption?: string | null
           created_at?: string | null
           id?: string
           is_ai_generated?: boolean | null
           is_private?: boolean | null
           is_removed?: boolean | null
+          location?: string | null
           removed_at?: string | null
           removed_reason?: string | null
           updated_at?: string | null
@@ -364,12 +404,14 @@ export type Database = {
           view_count?: number | null
         }
         Update: {
+          aspect_ratio?: string | null
           caption?: string | null
           created_at?: string | null
           id?: string
           is_ai_generated?: boolean | null
           is_private?: boolean | null
           is_removed?: boolean | null
+          location?: string | null
           removed_at?: string | null
           removed_reason?: string | null
           updated_at?: string | null
