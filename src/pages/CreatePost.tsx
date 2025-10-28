@@ -136,26 +136,40 @@ const CreatePost = () => {
 
       if (postError) throw postError;
 
-      // Upload images and create slide records
+      toast.loading(`Uploading ${slides.length} image${slides.length > 1 ? 's' : ''}...`, { id: 'upload-progress' });
+
+      // Upload images and create slide records with progress tracking
       const slidePromises = slides.map(async (slide, index) => {
         // Upload image
         const fileExt = slide.file.name.split(".").pop();
         const fileName = `${user.id}/${post.id}/${Date.now()}-${index}.${fileExt}`;
 
-        const { error: uploadError, data } = await supabase.storage
+        const { error: uploadError } = await supabase.storage
           .from("posts")
-          .upload(fileName, slide.file, { upsert: false });
+          .upload(fileName, slide.file, { 
+            upsert: false,
+            contentType: slide.file.type
+          });
 
         if (uploadError) throw uploadError;
 
+        // Get base public URL
         const {
           data: { publicUrl },
         } = supabase.storage.from("posts").getPublicUrl(fileName);
 
-        // Create slide record
+        // Generate optimized URLs with Supabase transformations
+        // Full slide: 1200px width, 85% quality, WebP format
+        const fullImageUrl = `${publicUrl}?width=1200&quality=85&format=webp`;
+        
+        // Thumbnail: 400x400px, 80% quality, WebP format
+        const thumbnailUrl = `${publicUrl}?width=400&height=400&quality=80&format=webp`;
+
+        // Create slide record with both URLs
         return supabase.from("post_images").insert({
           post_id: post.id,
-          image_url: publicUrl,
+          image_url: fullImageUrl,
+          thumbnail_url: thumbnailUrl,
           order_index: index,
           caption: slide.caption || null,
           alt_text: slide.altText || null,
@@ -164,6 +178,8 @@ const CreatePost = () => {
       });
 
       await Promise.all(slidePromises);
+      
+      toast.dismiss('upload-progress');
 
       // Clear draft from IndexedDB
       try {

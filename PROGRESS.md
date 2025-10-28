@@ -345,6 +345,30 @@ All tables have appropriate indexes for frequently queried columns:
 - ✅ Create post_images records for each slide
 - ✅ **Redirect to post viewer** (`/post/{id}`)
 
+### Image Optimization (Supabase Storage)
+
+**Storage Configuration:**
+- ✅ 'posts' bucket created in Supabase Storage
+- ✅ Public bucket for global CDN delivery
+- ✅ File size limit: 10MB per image (enforced in UI)
+- ✅ Allowed MIME types: image/jpeg, image/png, image/webp
+
+**Image Transformations (via Supabase URL parameters):**
+- ✅ **Thumbnail** (feed preview): 400x400px, 80% quality, WebP
+- ✅ **Full slide** (viewer): 1200px width, 85% quality, WebP
+- ✅ Auto-convert to WebP format via URL transformation
+- ✅ EXIF metadata stripped automatically by Supabase
+- 🔄 Profile avatar: 200x200px, 80% quality (to be implemented in profile editor)
+- 🔄 Collection cover: 600x400px, 80% quality (to be implemented with collections)
+
+**Upload Process:**
+- ✅ Upload original image to Supabase Storage
+- ✅ Generate thumbnail URL with transformations (`?width=400&height=400&quality=80&format=webp`)
+- ✅ Generate full-size URL with transformations (`?width=1200&quality=85&format=webp`)
+- ✅ Store both URLs in post_images table
+- ✅ Upload progress toast notification
+- 🔄 Detailed progress bar per image (future enhancement)
+
 ### Feed Display
 - ✅ Home feed with real posts from database
 - ✅ Post card component with carousel
