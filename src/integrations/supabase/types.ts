@@ -14,6 +14,50 @@ export type Database = {
   }
   public: {
     Tables: {
+      appeals: {
+        Row: {
+          admin_response: string | null
+          appeal_text: string
+          created_at: string | null
+          id: string
+          report_id: string
+          reviewed_at: string | null
+          reviewed_by: string | null
+          status: string | null
+          user_id: string
+        }
+        Insert: {
+          admin_response?: string | null
+          appeal_text: string
+          created_at?: string | null
+          id?: string
+          report_id: string
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string | null
+          user_id: string
+        }
+        Update: {
+          admin_response?: string | null
+          appeal_text?: string
+          created_at?: string | null
+          id?: string
+          report_id?: string
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "appeals_report_id_fkey"
+            columns: ["report_id"]
+            isOneToOne: false
+            referencedRelation: "reports"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       collection_items: {
         Row: {
           added_at: string | null
@@ -299,6 +343,9 @@ export type Database = {
           id: string
           is_ai_generated: boolean | null
           is_private: boolean | null
+          is_removed: boolean | null
+          removed_at: string | null
+          removed_reason: string | null
           updated_at: string | null
           user_id: string
           view_count: number | null
@@ -309,6 +356,9 @@ export type Database = {
           id?: string
           is_ai_generated?: boolean | null
           is_private?: boolean | null
+          is_removed?: boolean | null
+          removed_at?: string | null
+          removed_reason?: string | null
           updated_at?: string | null
           user_id: string
           view_count?: number | null
@@ -319,6 +369,9 @@ export type Database = {
           id?: string
           is_ai_generated?: boolean | null
           is_private?: boolean | null
+          is_removed?: boolean | null
+          removed_at?: string | null
+          removed_reason?: string | null
           updated_at?: string | null
           user_id?: string
           view_count?: number | null
@@ -336,6 +389,7 @@ export type Database = {
       profiles: {
         Row: {
           account_created_at: string | null
+          account_status: string | null
           avatar_url: string | null
           bio: string | null
           birthdate: string | null
@@ -345,11 +399,14 @@ export type Database = {
           id: string
           is_private: boolean | null
           last_post_at: string | null
+          suspended_at: string | null
+          suspension_reason: string | null
           updated_at: string | null
           username: string | null
         }
         Insert: {
           account_created_at?: string | null
+          account_status?: string | null
           avatar_url?: string | null
           bio?: string | null
           birthdate?: string | null
@@ -359,11 +416,14 @@ export type Database = {
           id: string
           is_private?: boolean | null
           last_post_at?: string | null
+          suspended_at?: string | null
+          suspension_reason?: string | null
           updated_at?: string | null
           username?: string | null
         }
         Update: {
           account_created_at?: string | null
+          account_status?: string | null
           avatar_url?: string | null
           bio?: string | null
           birthdate?: string | null
@@ -373,10 +433,59 @@ export type Database = {
           id?: string
           is_private?: boolean | null
           last_post_at?: string | null
+          suspended_at?: string | null
+          suspension_reason?: string | null
           updated_at?: string | null
           username?: string | null
         }
         Relationships: []
+      }
+      reports: {
+        Row: {
+          created_at: string | null
+          details: string | null
+          id: string
+          reason: string
+          reported_post_id: string | null
+          reported_user_id: string | null
+          reporter_id: string | null
+          reviewed_at: string | null
+          reviewed_by: string | null
+          status: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          details?: string | null
+          id?: string
+          reason: string
+          reported_post_id?: string | null
+          reported_user_id?: string | null
+          reporter_id?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          details?: string | null
+          id?: string
+          reason?: string
+          reported_post_id?: string | null
+          reported_user_id?: string | null
+          reporter_id?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "reports_reported_post_id_fkey"
+            columns: ["reported_post_id"]
+            isOneToOne: false
+            referencedRelation: "posts"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       reserved_usernames: {
         Row: {
@@ -416,15 +525,42 @@ export type Database = {
           },
         ]
       }
+      user_roles: {
+        Row: {
+          created_at: string | null
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
     }
     Enums: {
-      [_ in never]: never
+      app_role: "admin" | "moderator" | "user"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -551,6 +687,8 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      app_role: ["admin", "moderator", "user"],
+    },
   },
 } as const

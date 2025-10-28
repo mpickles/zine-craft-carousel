@@ -111,6 +111,37 @@ All tables created with Row Level Security (RLS) policies:
 - `read` (boolean, default false)
 - `created_at` (timestamp)
 
+**user_roles** (Admin/Moderator roles):
+- `id` (UUID, primary key)
+- `user_id` (UUID, foreign key to auth.users)
+- `role` (app_role enum: 'admin', 'moderator', 'user')
+- `created_at` (timestamp)
+- Unique constraint on (user_id, role)
+- Security definer function `has_role()` for safe role checking
+
+**reports** (Content reporting):
+- `id` (UUID, primary key)
+- `reporter_id` (UUID, foreign key to auth.users)
+- `reported_post_id` (UUID, nullable, foreign key to posts)
+- `reported_user_id` (UUID, nullable, foreign key to auth.users)
+- `reason` (text: spam, harassment, violence, hate_speech, sexual_content, copyright, ai_unlabeled, other)
+- `details` (text, optional description)
+- `status` (text: 'pending', 'resolved', 'dismissed')
+- `reviewed_by` (UUID, foreign key to auth.users)
+- `reviewed_at` (timestamp)
+- `created_at` (timestamp)
+
+**appeals** (Content removal appeals):
+- `id` (UUID, primary key)
+- `user_id` (UUID, foreign key to auth.users)
+- `report_id` (UUID, foreign key to reports)
+- `appeal_text` (text)
+- `status` (text: 'pending', 'approved', 'denied')
+- `reviewed_by` (UUID, foreign key to auth.users)
+- `reviewed_at` (timestamp)
+- `admin_response` (text)
+- `created_at` (timestamp)
+
 #### Performance Indexes:
 - `profiles`: username
 - `posts`: user_id, created_at DESC, view_count DESC, (user_id, created_at DESC)
@@ -119,6 +150,9 @@ All tables created with Row Level Security (RLS) policies:
 - `collection_items`: collection_id, post_id
 - `follows`: follower_id, following_id
 - `saves`: user_id, post_id
+- `reports`: status, created_at DESC
+- `appeals`: status
+- `user_roles`: user_id
 
 #### Security Tables:
 - **reserved_usernames**: Prevents squatting on @admin, @zine, @help, @support, @moderator, @official, @team, @staff
@@ -599,26 +633,182 @@ All tables have appropriate indexes for frequently queried columns:
 
 ---
 
+## ✅ Completed (Phase 7: Moderation & Safety)
+
+**Status: FULLY WORKING ✅**
+
+### Database Schema
+
+**user_roles table** (Secure role management):
+- `id` (UUID, primary key)
+- `user_id` (UUID, references auth.users)
+- `role` (app_role enum: 'admin', 'moderator', 'user')
+- `created_at` (timestamp)
+- Unique constraint on (user_id, role)
+- Security definer function `has_role()` for safe role checking
+
+**reports table** (Content reporting):
+- `id` (UUID, primary key)
+- `reporter_id` (UUID, references auth.users)
+- `reported_post_id` (UUID, nullable, references posts)
+- `reported_user_id` (UUID, nullable, references auth.users)
+- `reason` (text: spam, harassment, violence, hate_speech, sexual_content, copyright, ai_unlabeled, other)
+- `details` (text, optional, max 500 chars)
+- `status` (text: 'pending', 'resolved', 'dismissed')
+- `reviewed_by` (UUID, references auth.users)
+- `reviewed_at` (timestamp)
+- `created_at` (timestamp)
+
+**appeals table** (Content removal appeals):
+- `id` (UUID, primary key)
+- `user_id` (UUID, references auth.users)
+- `report_id` (UUID, references reports)
+- `appeal_text` (text)
+- `status` (text: 'pending', 'approved', 'denied')
+- `reviewed_by` (UUID, references auth.users)
+- `reviewed_at` (timestamp)
+- `admin_response` (text)
+- `created_at` (timestamp)
+
+**Moderation fields added to posts:**
+- `is_removed` (boolean, default false)
+- `removed_reason` (text)
+- `removed_at` (timestamp)
+
+**Moderation fields added to profiles:**
+- `account_status` (text: 'active', 'warned', 'suspended')
+- `suspended_at` (timestamp)
+- `suspension_reason` (text)
+
+### Reporting System
+
+**Report Button:**
+- ✅ Appears in dropdown menu on posts and profiles
+- ✅ Flag icon for easy recognition
+- ✅ Opens report modal on click
+- ✅ Integrated into PostCard and profile pages
+
+**Report Modal:**
+- ✅ Clean dialog interface
+- ✅ Reason dropdown with 8 categories:
+  * Spam/Scams
+  * Harassment
+  * Violence/Gore
+  * Hate Speech
+  * Sexual Content
+  * Copyright (DMCA)
+  * AI Unlabeled
+  * Other
+- ✅ Optional details textarea (500 char limit)
+- ✅ Character counter
+- ✅ Submit validation (reason required)
+- ✅ Success confirmation: "Thanks for reporting. We'll review within 24 hours."
+- ✅ Auth check (redirects to login if not authenticated)
+- ✅ Saves to reports table with pending status
+
+### Admin Dashboard
+
+**Access Control:**
+- ✅ Route protection at `/admin`
+- ✅ Secure role checking via `has_role()` function
+- ✅ Custom hook `useAdminCheck` for role validation
+- ✅ Redirects non-admins to feed
+- ✅ Loading states during auth check
+- ✅ RLS policies prevent unauthorized access
+
+**Dashboard Layout:**
+- ✅ Professional admin interface with shield icon
+- ✅ Three tabs: Pending Reports, Resolved, Dismissed
+- ✅ Alert banner with admin instructions
+- ✅ Responsive design for all screen sizes
+
+**Pending Reports Tab:**
+- ✅ List of all pending reports
+- ✅ Reporter info with avatar and username
+- ✅ Timestamp with relative formatting
+- ✅ Reason badge (color-coded)
+- ✅ Reported content preview
+- ✅ "View Content" button (opens in new tab)
+- ✅ Additional details display
+- ✅ Action buttons:
+  * Remove Content (for post reports)
+  * Resolve (marks as resolved)
+  * Dismiss (marks as dismissed)
+- ✅ Loading states during actions
+- ✅ Empty state for no pending reports
+
+**Resolved Reports Tab:**
+- ✅ Shows last 20 resolved reports
+- ✅ Reporter info and reason
+- ✅ Timestamps (reported + resolved)
+- ✅ Check icon indicator
+- ✅ Clean history view
+
+**Dismissed Reports Tab:**
+- ✅ Shows last 20 dismissed reports
+- ✅ Reporter info and reason
+- ✅ Timestamps (reported + dismissed)
+- ✅ X icon indicator
+- ✅ Archive view for false positives
+
+**Moderation Actions:**
+- ✅ **Remove Content**: Sets `is_removed = true` on posts
+- ✅ Auto-resolves report when content removed
+- ✅ Stores removal reason from report
+- ✅ Timestamps removal action
+- ✅ Toast notifications for all actions
+- ✅ Error handling with user feedback
+
+### Security Implementation
+
+**Role-Based Access Control:**
+- ✅ Separate `user_roles` table (not on profiles)
+- ✅ Enum type for roles (admin, moderator, user)
+- ✅ Security definer function prevents RLS recursion
+- ✅ Proper RLS policies for all moderation tables
+- ✅ Server-side role validation only
+- ✅ No client-side role storage (no localStorage)
+
+**Report Privacy:**
+- ✅ Users can only view their own reports
+- ✅ Admins and moderators can view all reports
+- ✅ Reporter identity protected from reported users
+- ✅ Report details only visible to staff
+
+**Audit Trail:**
+- ✅ `reviewed_by` tracks who handled report
+- ✅ `reviewed_at` timestamps all actions
+- ✅ Status changes logged
+- ✅ Removal actions timestamped
+
+### Features Not Yet Implemented
+
+**V2 Features (Future):**
+- 🔄 Warn User action (email notification)
+- 🔄 Ban User action (account suspension)
+- 🔄 Appeal system UI for users
+- 🔄 Admin response to appeals
+- 🔄 Retroactive AI labeling
+- 🔄 User-facing removed content banner
+- 🔄 Content restoration flow
+- 🔄 Bulk moderation actions
+- 🔄 Moderator activity logs
+- 🔄 Report analytics dashboard
+
+---
+
 ## 🚧 Not Yet Built
 
 ### Phase 6: Saves/Bookmarks
-- [ ] Save/bookmark button on posts
-- [ ] Saved posts page
-- [ ] Quick save functionality (separate from collections)
+- ✅ Save/bookmark button on posts (implemented as collection system)
+- ✅ Collections system (see Phase 5)
 
-### Phase 7: Collections (Remaining)
-- [ ] Save to collection button
-- [ ] Collection picker modal
-- [ ] Create collection flow
-- [ ] Collections page
-- [ ] Collection detail page
-- [ ] Featured collection widget
-
-### Phase 8: Moderation
-- [ ] Report button
-- [ ] Admin dashboard
-- [ ] Content removal flow
-- [ ] Appeal system
+### Phase 8: Remaining Moderation Features
+- 🔄 Warn User email notifications
+- 🔄 Ban User / account suspension UI
+- 🔄 Appeal system user interface
+- 🔄 Removed content banner for users
+- 🔄 Content restoration workflow
 
 ### Phase 9: Polish
 - [ ] Legal pages (privacy, terms, guidelines)
@@ -641,6 +831,10 @@ All tables have appropriate indexes for frequently queried columns:
 ✅ **Password requirements**: Min 8 chars, 1 uppercase, 1 number
 ✅ **Age verification**: 13+ years (COPPA compliance)
 ✅ **Auth token management**: Auto-refresh handled by Supabase
+✅ **Role-based access control**: Separate user_roles table with security definer function
+✅ **Admin dashboard protection**: Server-side role validation only
+✅ **Report privacy**: Users can only view their own reports
+✅ **Audit trail**: All moderation actions logged with reviewer and timestamp
 ⚠️ **Leaked password protection**: Should be enabled in Supabase Auth settings (dashboard)
 
 ---
@@ -699,15 +893,16 @@ All tables have appropriate indexes for frequently queried columns:
 
 ---
 
-**Last Updated:** October 27, 2025
-**Current Phase:** Phase 3 (Discovery - Explore) ✅
-**Next Phase:** User Search & Notifications 🚧
+**Last Updated:** October 28, 2025
+**Current Phase:** Phase 7 (Moderation & Safety) ✅
+**Next Phase:** Polish & Launch Prep 🚧
 
 ---
 
-## 🎯 Current Sprint: User Search
+## 🎯 Current Sprint: Remaining Features
 
 Next to build:
-1. User search functionality
-2. Search bar in navbar or dedicated search page
-3. Then: Notification system for social interactions
+1. Warn/Ban user actions
+2. Appeal system user interface
+3. Legal pages (privacy, terms, guidelines)
+4. Open Graph meta tags for sharing
