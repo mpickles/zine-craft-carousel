@@ -23,7 +23,7 @@ interface Post {
   }[];
 }
 
-type ExploreMode = "trending" | "new" | "random";
+type ExploreMode = "trending" | "random";
 
 export const useExplorePosts = (mode: ExploreMode = "trending") => {
   return useQuery({
@@ -54,14 +54,17 @@ export const useExplorePosts = (mode: ExploreMode = "trending") => {
 
       // Apply different ordering based on mode
       if (mode === "trending") {
-        // Sort by view count and recent activity
-        query = query.order("view_count", { ascending: false });
-      } else if (mode === "new") {
-        // Sort by creation date
-        query = query.order("created_at", { ascending: false });
+        // Sort by view count and recent activity (last 24 hours)
+        query = query
+          .gte("created_at", new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString())
+          .order("view_count", { ascending: false })
+          .limit(100);
       } else if (mode === "random") {
-        // Get random posts - we'll randomize after fetching
-        query = query.order("created_at", { ascending: false }).limit(50);
+        // Get random posts from last 7 days - we'll randomize after fetching
+        query = query
+          .gte("created_at", new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString())
+          .order("created_at", { ascending: false })
+          .limit(50);
       }
 
       const { data, error } = await query;

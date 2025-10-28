@@ -1,17 +1,17 @@
 import { useState, useEffect } from "react";
 import { Navbar } from "@/components/layout/Navbar";
-import { PostCard } from "@/components/feed/PostCard";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useExplorePosts } from "@/hooks/useExplorePosts";
-import { TrendingUp, Clock, Shuffle } from "lucide-react";
+import { TrendingUp, Shuffle } from "lucide-react";
 import { useSearchParams } from "react-router-dom";
 import { PostViewerModal } from "@/components/post/PostViewerModal";
 import { usePostNavigation } from "@/hooks/usePostNavigation";
 import { AnimatePresence } from "framer-motion";
+import { TrendingGrid } from "@/components/explore/TrendingGrid";
+import { RandomFeed } from "@/components/explore/RandomFeed";
 
-type ExploreMode = "trending" | "new" | "random";
+type ExploreMode = "trending" | "random";
 
 const Explore = () => {
   const [mode, setMode] = useState<ExploreMode>("trending");
@@ -46,67 +46,57 @@ const Explore = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-bg-primary">
       <Navbar />
 
-      <main className="container mx-auto px-4 py-4 sm:py-8">
-        <div className="max-w-4xl mx-auto">
-          {/* Header */}
-          <div className="mb-6 sm:mb-8">
-            <h1 className="text-2xl sm:text-3xl font-bold mb-2">Explore</h1>
-            <p className="text-sm sm:text-base text-muted-foreground">
-              Discover amazing content from creators around the world
-            </p>
-          </div>
-
-          {/* Tabs */}
-          <Tabs value={mode} onValueChange={(value) => setMode(value as ExploreMode)}>
-            <TabsList className="grid w-full grid-cols-3 mb-6 sm:mb-8">
-              <TabsTrigger value="trending" className="gap-1 sm:gap-2">
-                <TrendingUp className="w-4 h-4" />
-                <span className="hidden xs:inline">Trending</span>
-              </TabsTrigger>
-              <TabsTrigger value="new" className="gap-1 sm:gap-2">
-                <Clock className="w-4 h-4" />
-                <span className="hidden xs:inline">New</span>
-              </TabsTrigger>
-              <TabsTrigger value="random" className="gap-1 sm:gap-2">
-                <Shuffle className="w-4 h-4" />
-                <span className="hidden xs:inline">Random</span>
-              </TabsTrigger>
-            </TabsList>
-
-            <TabsContent value="trending" className="space-y-4 sm:space-y-6">
-              {isLoading ? (
-                <LoadingSkeleton />
-              ) : posts.length === 0 ? (
-                <EmptyState message="No trending posts yet" />
-              ) : (
-                posts.map((post) => <PostCard key={post.id} post={post} onOpenModal={handleOpenModal} />)
-              )}
-            </TabsContent>
-
-            <TabsContent value="new" className="space-y-4 sm:space-y-6">
-              {isLoading ? (
-                <LoadingSkeleton />
-              ) : posts.length === 0 ? (
-                <EmptyState message="No new posts yet" />
-              ) : (
-                posts.map((post) => <PostCard key={post.id} post={post} onOpenModal={handleOpenModal} />)
-              )}
-            </TabsContent>
-
-            <TabsContent value="random" className="space-y-4 sm:space-y-6">
-              {isLoading ? (
-                <LoadingSkeleton />
-              ) : posts.length === 0 ? (
-                <EmptyState message="No posts to discover yet" />
-              ) : (
-                posts.map((post) => <PostCard key={post.id} post={post} onOpenModal={handleOpenModal} />)
-              )}
-            </TabsContent>
-          </Tabs>
+      <main className="container mx-auto px-4 py-8 sm:py-12">
+        {/* Header */}
+        <div className="mb-8 sm:mb-12">
+          <h1 className="font-display text-5xl sm:text-6xl font-bold tracking-tight text-text-primary mb-3">
+            Explore
+          </h1>
+          <p className="text-base sm:text-lg text-text-secondary font-primary">
+            Discover amazing content from creators around the world
+          </p>
         </div>
+
+        {/* Tab Navigation */}
+        <div className="flex gap-1 mb-8 sm:mb-12 border-b border-border-light">
+          <button
+            onClick={() => setMode("trending")}
+            className={`pb-3 px-6 font-primary text-sm font-medium uppercase tracking-wide transition-all duration-150 ${
+              mode === "trending"
+                ? "border-b-2 border-brand-accent text-text-primary"
+                : "text-text-secondary hover:text-text-primary"
+            }`}
+          >
+            <TrendingUp className="w-4 h-4 inline-block mr-2 mb-0.5" />
+            Trending
+          </button>
+          <button
+            onClick={() => setMode("random")}
+            className={`pb-3 px-6 font-primary text-sm font-medium uppercase tracking-wide transition-all duration-150 ${
+              mode === "random"
+                ? "border-b-2 border-brand-accent text-text-primary"
+                : "text-text-secondary hover:text-text-primary"
+            }`}
+          >
+            <Shuffle className="w-4 h-4 inline-block mr-2 mb-0.5" />
+            Random
+          </button>
+        </div>
+
+        {/* Content */}
+        {isLoading ? (
+          <LoadingSkeleton mode={mode} />
+        ) : posts.length === 0 ? (
+          <EmptyState message={mode === "trending" ? "No trending posts yet" : "No posts to discover yet"} />
+        ) : (
+          <>
+            {mode === "trending" && <TrendingGrid posts={posts} onOpenModal={handleOpenModal} />}
+            {mode === "random" && <RandomFeed posts={posts} onOpenModal={handleOpenModal} />}
+          </>
+        )}
       </main>
 
       {/* Post Viewer Modal */}
@@ -125,30 +115,43 @@ const Explore = () => {
   );
 };
 
-const LoadingSkeleton = () => (
-  <>
-    {[1, 2, 3].map((i) => (
-      <Card key={i} className="overflow-hidden">
-        <div className="flex items-center gap-3 p-4">
-          <Skeleton className="h-10 w-10 rounded-full" />
-          <div className="space-y-2">
-            <Skeleton className="h-4 w-32" />
-            <Skeleton className="h-3 w-24" />
+const LoadingSkeleton = ({ mode }: { mode: ExploreMode }) => {
+  if (mode === "trending") {
+    return (
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-4">
+        {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
+          <div key={i} className="aspect-square">
+            <Skeleton className="w-full h-full rounded-lg" />
           </div>
-        </div>
-        <Skeleton className="aspect-square w-full" />
-        <div className="p-4 space-y-3">
-          <div className="flex gap-4">
-            <Skeleton className="h-8 w-8" />
-            <Skeleton className="h-8 w-8" />
-            <Skeleton className="h-8 w-8 ml-auto" />
+        ))}
+      </div>
+    );
+  }
+
+  return (
+    <div className="max-w-2xl mx-auto space-y-6">
+      {[1, 2, 3].map((i) => (
+        <Card key={i} className="overflow-hidden">
+          <div className="flex items-center gap-3 p-4">
+            <Skeleton className="h-10 w-10 rounded-full" />
+            <div className="space-y-2">
+              <Skeleton className="h-4 w-32" />
+              <Skeleton className="h-3 w-24" />
+            </div>
           </div>
-          <Skeleton className="h-12 w-full" />
-        </div>
-      </Card>
-    ))}
-  </>
-);
+          <Skeleton className="aspect-square w-full" />
+          <div className="p-4 space-y-3">
+            <Skeleton className="h-12 w-full" />
+            <div className="flex gap-3">
+              <Skeleton className="h-8 w-20" />
+              <Skeleton className="h-8 w-20" />
+            </div>
+          </div>
+        </Card>
+      ))}
+    </div>
+  );
+};
 
 const EmptyState = ({ message }: { message: string }) => (
   <Card className="p-12 text-center">
