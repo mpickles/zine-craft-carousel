@@ -14,6 +14,7 @@ import { EditProfileDialog } from "@/components/profile/EditProfileDialog";
 import { FollowButton } from "@/components/profile/FollowButton";
 import { PostsGrid } from "@/components/profile/PostsGrid";
 import { CollectionsGrid } from "@/components/profile/CollectionsGrid";
+import { FrontPage } from "@/components/profile/FrontPage";
 
 interface Profile {
   id: string;
@@ -192,8 +193,14 @@ const Profile = () => {
           </Card>
 
           {/* Tabs Navigation */}
-          <Tabs defaultValue="posts" className="w-full">
+          <Tabs defaultValue="front-page" className="w-full">
             <TabsList className="w-full justify-start border-b rounded-none h-auto p-0 bg-transparent">
+              <TabsTrigger
+                value="front-page"
+                className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent"
+              >
+                Front Page
+              </TabsTrigger>
               <TabsTrigger
                 value="posts"
                 className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent"
@@ -207,6 +214,14 @@ const Profile = () => {
                 Collections
               </TabsTrigger>
             </TabsList>
+
+            {/* Front Page Tab */}
+            <TabsContent value="front-page" className="mt-6">
+              <FrontPage
+                userId={profile.id}
+                bio={profile.bio || undefined}
+              />
+            </TabsContent>
 
             {/* Posts Tab */}
             <TabsContent value="posts" className="mt-6">

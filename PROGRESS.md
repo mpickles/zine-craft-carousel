@@ -446,6 +446,33 @@ All tables have appropriate indexes for frequently queried columns:
 - ✅ [Export My Data] button (downloads JSON)
 - ✅ [Delete Account] button with confirmation dialog
 
+### Profile Customization (Simplified MVP)
+
+**Three Profile Tabs:**
+- ✅ Front Page (customizable landing page)
+- ✅ Posts (3-column grid)
+- ✅ Collections (collection cards grid)
+
+**Front Page Tab:**
+- ✅ Bio section display
+- ✅ Links section with external link buttons
+- ✅ Latest Posts widget placeholder
+- ✅ Template-based layout (Minimal template implemented)
+- 🔄 Magazine template (featured collection + social icons)
+- 🔄 Portfolio template (image header + posts grid)
+
+**Template System (V2):**
+- 🔄 Template picker in Settings → "Customize Front Page"
+- 🔄 3 pre-made layouts (Minimal, Magazine, Portfolio)
+- 🔄 Template preview
+- 🔄 Template-specific content fields
+- 🔄 Theme presets (font pairs + color schemes)
+
+**Default Template:**
+- ✅ Auto-displays bio and links on Front Page
+- ✅ Latest Posts widget (implemented)
+- 🔄 Auto-create on signup with default content
+
 ## ✅ Completed (Phase 3: Post Viewer)
 
 **Status: FULLY WORKING ✅**
