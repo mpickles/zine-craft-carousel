@@ -178,10 +178,10 @@ export const CarouselBuilder = ({
 
   return (
     <div className="flex flex-col h-screen bg-bg-primary">
-      {/* Header */}
-      <header className="flex items-center justify-between px-6 py-4 border-b border-border-light bg-bg-elevated shadow-sm">
-        <Button variant="ghost" size="icon" onClick={onCancel} aria-label="Cancel">
-          <X className="w-5 h-5" />
+      {/* Header - Fixed at top */}
+      <header className="fixed top-0 left-0 right-0 h-16 z-50 flex items-center justify-between px-4 border-b border-border-light bg-bg-elevated shadow-sm">
+        <Button variant="ghost" size="icon" onClick={onCancel} aria-label="Cancel" className="w-10 h-10">
+          <X className="w-6 h-6" />
         </Button>
         <h1 className="text-lg font-semibold text-text-primary">New Post</h1>
         <Button 
@@ -195,11 +195,11 @@ export const CarouselBuilder = ({
         </Button>
       </header>
 
-      {/* Main Content */}
-      <main className="flex-1 flex flex-col overflow-hidden">
+      {/* Main Content - Scrollable area between header and bottom tray */}
+      <main className="mt-16 mb-48 overflow-y-auto">
         {slides.length === 0 ? (
           /* Empty State */
-          <div className="flex-1 flex flex-col items-center justify-center p-8 text-center">
+          <div className="flex flex-col items-center justify-center p-8 text-center min-h-[calc(100vh-16rem)]">
             <div className="w-32 h-32 rounded-full bg-bg-tertiary flex items-center justify-center mb-6">
               <Plus className="w-16 h-16 text-text-tertiary" />
             </div>
@@ -219,102 +219,101 @@ export const CarouselBuilder = ({
             </Button>
           </div>
         ) : (
-          <>
-            {/* Preview Area - Fixed Aspect Ratio */}
-            <div className="flex-1 flex items-center justify-center p-6 bg-bg-secondary overflow-hidden">
-              <div className="w-full max-w-md">
-                {/* Fixed 4:5 aspect ratio card */}
-                <div className="relative w-full" style={{ paddingBottom: '125%' }}>
-                  <div className="absolute inset-0 bg-bg-primary rounded-xl overflow-hidden shadow-lg border border-border-light">
-                    {currentSlide && (
-                      <img
-                        src={currentSlide.imageUrl}
-                        alt={currentSlide.altText || `Slide ${currentSlideIndex + 1}`}
-                        className="w-full h-full object-cover"
-                      />
-                    )}
-                  </div>
-                </div>
-                
-                {/* Slide Counter */}
-                <div className="mt-4 text-center">
-                  <p className="text-sm font-medium text-text-secondary">
-                    Slide {currentSlideIndex + 1} of {slides.length}
-                  </p>
-                </div>
+          <div className="px-4 py-6">
+            {/* Preview Container - 1:1 Square Aspect Ratio */}
+            <div className="w-full max-w-[600px] mx-auto">
+              {/* Square Preview with Black Background */}
+              <div className="relative w-full aspect-square bg-black rounded-xl overflow-hidden shadow-lg">
+                {currentSlide && (
+                  <img
+                    src={currentSlide.imageUrl}
+                    alt={currentSlide.altText || `Slide ${currentSlideIndex + 1}`}
+                    className="w-full h-full object-contain"
+                  />
+                )}
               </div>
-            </div>
-
-            {/* Action Buttons */}
-            <div className="flex items-center justify-center gap-3 py-4 px-6 border-t border-border-light bg-bg-elevated">
-              <Button
-                variant="outline"
-                size="default"
-                onClick={() => setEditModalOpen(true)}
-                disabled={!currentSlide}
-                className="min-w-[140px]"
-              >
-                <Edit className="w-4 h-4 mr-2" />
-                Edit Image
-              </Button>
-              <Button
-                variant="outline"
-                size="default"
-                onClick={() => setCaptionModalOpen(true)}
-                disabled={!currentSlide}
-                className="min-w-[140px]"
-              >
-                <MessageSquare className="w-4 h-4 mr-2" />
-                Add Caption
-              </Button>
-            </div>
-
-            {/* Bottom Tray - With Proper Padding */}
-            <div className="border-t border-border-light bg-bg-elevated px-6 py-4">
-              <div className="max-w-4xl mx-auto">
-                <div className="flex items-center gap-3 overflow-x-auto pb-2">
-                  <DndContext
-                    sensors={sensors}
-                    collisionDetection={closestCenter}
-                    onDragEnd={handleDragEnd}
-                  >
-                    <SortableContext
-                      items={slides.map((s) => s.id)}
-                      strategy={horizontalListSortingStrategy}
-                    >
-                      {slides.map((slide, idx) => (
-                        <SlideThumbnail
-                          key={slide.id}
-                          slide={slide}
-                          isActive={idx === currentSlideIndex}
-                          onClick={() => onCurrentSlideChange(idx)}
-                          onRemove={() => handleRemoveSlide(slide.id)}
-                        />
-                      ))}
-                    </SortableContext>
-                  </DndContext>
-
-                  {/* Add Button */}
-                  {slides.length < MAX_SLIDES && (
-                    <button
-                      onClick={() => fileInputRef.current?.click()}
-                      className="flex-shrink-0 w-20 h-20 rounded-lg border-2 border-dashed border-border-medium hover:border-brand-accent hover:bg-bg-secondary transition-all flex items-center justify-center group"
-                      aria-label="Add more slides"
-                    >
-                      <Plus className="w-8 h-8 text-text-tertiary group-hover:text-brand-accent transition-colors" />
-                    </button>
-                  )}
-                </div>
-                
-                {/* Helper Text */}
-                <p className="text-xs text-text-tertiary text-center mt-2">
-                  Click thumbnails to edit • Drag to reorder • Max {MAX_SLIDES} slides
+              
+              {/* Slide Indicator */}
+              <div className="mt-4 mb-4 text-center">
+                <p className="text-sm font-medium text-text-secondary">
+                  Slide {currentSlideIndex + 1} of {slides.length}
                 </p>
               </div>
+
+              {/* Action Buttons */}
+              <div className="flex items-center justify-center gap-3 mb-6">
+                <Button
+                  variant="outline"
+                  size="default"
+                  onClick={() => setEditModalOpen(true)}
+                  disabled={!currentSlide}
+                  className="min-w-[140px] h-11"
+                >
+                  <Edit className="w-4 h-4 mr-2" />
+                  Edit Image
+                </Button>
+                <Button
+                  variant="outline"
+                  size="default"
+                  onClick={() => setCaptionModalOpen(true)}
+                  disabled={!currentSlide}
+                  className="min-w-[140px] h-11"
+                >
+                  <MessageSquare className="w-4 h-4 mr-2" />
+                  Add Caption
+                </Button>
+              </div>
             </div>
-          </>
+          </div>
         )}
       </main>
+
+      {/* Bottom Tray - Fixed at bottom */}
+      {slides.length > 0 && (
+        <div className="fixed bottom-0 left-0 right-0 z-40 bg-bg-elevated border-t border-border-light rounded-t-xl p-4 shadow-lg">
+          <div className="max-w-4xl mx-auto">
+            {/* Scrollable Thumbnail Strip */}
+            <div className="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-hide">
+              <DndContext
+                sensors={sensors}
+                collisionDetection={closestCenter}
+                onDragEnd={handleDragEnd}
+              >
+                <SortableContext
+                  items={slides.map((s) => s.id)}
+                  strategy={horizontalListSortingStrategy}
+                >
+                  {slides.map((slide, idx) => (
+                    <SlideThumbnail
+                      key={slide.id}
+                      slide={slide}
+                      isActive={idx === currentSlideIndex}
+                      onClick={() => onCurrentSlideChange(idx)}
+                      onRemove={() => handleRemoveSlide(slide.id)}
+                    />
+                  ))}
+                </SortableContext>
+              </DndContext>
+
+              {/* Add Button */}
+              {slides.length < MAX_SLIDES && (
+                <button
+                  onClick={() => fileInputRef.current?.click()}
+                  className="flex-shrink-0 w-20 h-20 rounded-lg border-2 border-dashed border-border-medium hover:border-brand-accent hover:bg-bg-secondary transition-all flex items-center justify-center group"
+                  aria-label="Add more slides"
+                >
+                  <Plus className="w-8 h-8 text-text-tertiary group-hover:text-brand-accent transition-colors" />
+                </button>
+              )}
+            </div>
+            
+            {/* Helper Text */}
+            <p className="text-xs text-text-tertiary text-center mt-3">
+              Click thumbnails to edit • Drag to reorder • Max {MAX_SLIDES} slides
+            </p>
+          </div>
+        </div>
+      )}
 
       {/* Hidden File Input */}
       <input
