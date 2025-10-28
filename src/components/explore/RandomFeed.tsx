@@ -21,6 +21,7 @@ interface Post {
     id: string;
     image_url: string;
     thumbnail_url: string | null;
+    caption: string | null;
   }[];
 }
 
@@ -89,9 +90,9 @@ export const RandomFeed = ({ posts, onOpenModal }: RandomFeedProps) => {
 
             {/* Post info */}
             <div className="p-4">
-              {post.caption && (
+              {firstImage.caption && (
                 <p className="text-sm text-text-secondary line-clamp-2 font-primary mb-3">
-                  {post.caption}
+                  {firstImage.caption}
                 </p>
               )}
 

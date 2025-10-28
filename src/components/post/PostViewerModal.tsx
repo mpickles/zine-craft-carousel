@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useSwipeable } from "react-swipeable";
-import { X, ChevronLeft, ChevronRight, Share2, MoreVertical } from "lucide-react";
+import { X, ChevronLeft, ChevronRight, Share2 } from "lucide-react";
 import { usePost } from "@/hooks/usePost";
 import { useComments } from "@/hooks/useComments";
 import { supabase } from "@/integrations/supabase/client";
@@ -11,10 +11,11 @@ import { LikeButton } from "@/components/post/LikeButton";
 import { SaveButton } from "@/components/collections/SaveButton";
 import { CommentInput } from "@/components/post/CommentInput";
 import { CommentList } from "@/components/post/CommentList";
+import { PostOptionsMenu } from "@/components/post/PostOptionsMenu";
 import { OptimizedImage } from "@/components/ui/optimized-image";
 import { formatDistanceToNow } from "date-fns";
 import { toast } from "sonner";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 interface PostViewerModalProps {
   postId: string;
@@ -36,7 +37,8 @@ export const PostViewerModal = ({
   onNavigate,
   adjacentPostIds,
 }: PostViewerModalProps) => {
-  const { data: post, isLoading, error } = usePost(postId);
+  const navigate = useNavigate();
+  const { data: post, isLoading, error, refetch } = usePost(postId);
   const { comments, isLoading: commentsLoading, postComment, updateComment, deleteComment } = useComments(postId);
   
   const [currentSlide, setCurrentSlide] = useState(0);
@@ -242,12 +244,17 @@ export const PostViewerModal = ({
             </div>
           </Link>
 
-          <button
-            className="w-10 h-10 flex items-center justify-center rounded-full hover:bg-white/10 transition-colors"
-            aria-label="More options"
-          >
-            <MoreVertical className="w-5 h-5 text-white" />
-          </button>
+          <PostOptionsMenu
+            postId={post.id}
+            postUserId={post.user_id}
+            isPrivate={post.is_private || false}
+            caption={post.caption}
+            onDelete={() => {
+              onClose();
+              navigate(-1);
+            }}
+            onUpdate={() => refetch()}
+          />
         </header>
 
         {/* Main Content Area - Side by side layout on desktop (70/30 split) */}
