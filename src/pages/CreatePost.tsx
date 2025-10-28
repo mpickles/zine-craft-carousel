@@ -73,6 +73,13 @@ const CreatePost = () => {
       return;
     }
 
+    // Validate all slides have alt text (accessibility requirement)
+    const missingAltText = slides.some((slide) => !slide.altText?.trim());
+    if (missingAltText) {
+      toast.error("All images must have alt text for accessibility");
+      return;
+    }
+
     setPublishing(true);
 
     try {
@@ -188,18 +195,18 @@ const CreatePost = () => {
             <div className="space-y-4">
               {/* Main Caption */}
               <div className="space-y-2">
-                <Label htmlFor="caption">Caption (optional)</Label>
-                <Textarea
-                  id="caption"
-                  placeholder="Add a caption for your post..."
-                  value={caption}
-                  onChange={(e) => setCaption(e.target.value)}
-                  maxLength={1000}
-                  rows={4}
-                />
-                <p className="text-xs text-muted-foreground text-right">
-                  {caption.length}/1000
-                </p>
+              <Label htmlFor="caption">Overall caption (optional)</Label>
+              <Textarea
+                id="caption"
+                placeholder="Add a caption for your post..."
+                value={caption}
+                onChange={(e) => setCaption(e.target.value)}
+                maxLength={500}
+                rows={4}
+              />
+              <p className="text-xs text-muted-foreground text-right">
+                {caption.length}/500
+              </p>
               </div>
 
               {/* AI Generated */}
@@ -244,20 +251,27 @@ const CreatePost = () => {
             >
               Discard
             </Button>
-            <Button
-              onClick={handlePublish}
-              disabled={publishing || slides.length === 0}
-              size="lg"
-            >
-              {publishing ? (
-                <>
-                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                  Publishing...
-                </>
-              ) : (
-                "Publish Post"
+            <div className="flex flex-col items-end gap-2">
+              {slides.length > 0 && slides.some(s => !s.altText?.trim()) && (
+                <p className="text-xs text-muted-foreground">
+                  All images need alt text before publishing
+                </p>
               )}
-            </Button>
+              <Button
+                onClick={handlePublish}
+                disabled={publishing || slides.length === 0 || slides.some(s => !s.altText?.trim())}
+                size="lg"
+              >
+                {publishing ? (
+                  <>
+                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                    Publishing...
+                  </>
+                ) : (
+                  "Publish Post"
+                )}
+              </Button>
+            </div>
           </div>
         </div>
       </main>

@@ -303,16 +303,23 @@ All tables have appropriate indexes for frequently queried columns:
 
 ### Post Creation
 - ✅ Create post page (`/create`)
-- ✅ Image upload component (drag-drop, file picker)
-- ✅ Multi-slide carousel builder (1-12 images)
-- ✅ Per-slide caption editor (500 chars)
-- ✅ **Alt text input for accessibility** (200 chars, screen reader support)
-- ✅ Template selector per slide (Image Full, Image+Note, Quote, Side-by-Side)
-- ✅ Draft auto-save to localStorage (every 30s)
-- ✅ Publish flow (uploads to Supabase Storage)
-- ✅ Image validation (10MB max, JPG/PNG/WebP)
-- ✅ Slide reordering with drag handles
-- ✅ Post settings (caption, AI flag, privacy)
+- ✅ **Upload interface**: Drag-drop or click to upload 1-12 images
+- ✅ **File validation**: JPG/PNG/WebP only, max 10MB per image
+- ✅ **Thumbnail strip**: Horizontal thumbnails showing all slides
+- ✅ **Drag to reorder**: Reorder slides by dragging thumbnails
+- ✅ **Delete slides**: Remove button on each thumbnail
+- ✅ **Per-slide editor**: Click thumbnail to edit specific slide
+- ✅ **Template options**: Image Full, Image+Note, Quote, Side-by-Side
+- ✅ **Per-slide caption**: 500 char limit with live counter
+- ✅ **Alt text (required)**: Accessibility requirement, 200 char limit
+- ✅ **Post-level options**: Overall caption (500 chars), AI flag, privacy toggle
+- ✅ **Navigation**: Prev/Next buttons between slides, slide dots
+- ✅ **Draft auto-save**: localStorage every 30s, restores on return
+- ✅ **Publish validation**: Requires ≥1 slide, all slides must have alt text
+- ✅ **Cancel with confirmation**: "Discard draft?" confirmation dialog
+- ✅ **Image upload to Supabase Storage**: With proper path structure
+- ✅ **Database records**: Creates post + post_images records
+- ✅ **Post-publish redirect**: Redirects to user profile
 
 ### Feed Display
 - ✅ Home feed with real posts from database
