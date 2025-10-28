@@ -3,6 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { Card } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
+import { OptimizedImage } from "@/components/ui/optimized-image";
 import { Bookmark, Share2 } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 import { toast } from "sonner";
@@ -97,11 +98,11 @@ export const PostCard = ({ post }: PostCardProps) => {
 
       {/* First Slide Preview (400x400 thumbnail) */}
       <div className="relative aspect-square bg-muted">
-        <img
+        <OptimizedImage
           src={images[0]?.thumbnail_url || images[0]?.image_url}
           alt={images[0]?.caption || "Post image"}
+          aspectRatio="square"
           className="w-full h-full object-cover"
-          loading="lazy"
         />
         
         {/* Slide Count Indicator */}

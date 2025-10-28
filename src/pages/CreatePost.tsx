@@ -197,7 +197,21 @@ const CreatePost = () => {
       navigate(`/post/${post.id}`);
     } catch (error: any) {
       console.error("Error publishing post:", error);
-      toast.error(error.message || "Failed to publish post");
+      
+      // User-friendly error messages
+      let errorMessage = "Failed to publish post";
+      
+      if (error.message?.includes("storage")) {
+        errorMessage = "Failed to upload images. Please check your internet connection and try again.";
+      } else if (error.message?.includes("network")) {
+        errorMessage = "Network error. Please check your connection and try again.";
+      } else if (error.message?.includes("size")) {
+        errorMessage = "One or more images are too large. Please use smaller images.";
+      } else if (error.message) {
+        errorMessage = error.message;
+      }
+      
+      toast.error(errorMessage);
     } finally {
       setPublishing(false);
     }

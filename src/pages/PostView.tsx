@@ -1,10 +1,12 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
+import { Helmet } from "react-helmet-async";
 import { Navbar } from "@/components/layout/Navbar";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Card } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
+import { OptimizedImage } from "@/components/ui/optimized-image";
 import { usePost } from "@/hooks/usePost";
 import { useComments } from "@/hooks/useComments";
 import { formatDistanceToNow } from "date-fns";
@@ -57,6 +59,14 @@ const PostView = () => {
   }
 
   const images = post.post_images.sort((a, b) => a.order_index - b.order_index);
+  
+  const pageTitle = post.caption 
+    ? `${post.caption.slice(0, 60)}${post.caption.length > 60 ? '...' : ''} - @${post.profiles.username} on Zine`
+    : `Post by @${post.profiles.username} on Zine`;
+  
+  const pageDescription = post.caption || `Check out this post by @${post.profiles.username} on Zine`;
+  const pageImage = images[0]?.image_url || "";
+  const pageUrl = typeof window !== 'undefined' ? window.location.href : "";
 
   const nextSlide = () => {
     setCurrentSlide((prev) => (prev + 1) % images.length);
@@ -92,6 +102,27 @@ const PostView = () => {
 
   return (
     <div className="min-h-screen bg-background">
+      <Helmet>
+        <title>{pageTitle}</title>
+        <meta name="description" content={pageDescription} />
+        
+        {/* Open Graph */}
+        <meta property="og:type" content="article" />
+        <meta property="og:url" content={pageUrl} />
+        <meta property="og:title" content={pageTitle} />
+        <meta property="og:description" content={pageDescription} />
+        {pageImage && <meta property="og:image" content={pageImage} />}
+        <meta property="article:published_time" content={post.created_at} />
+        <meta property="article:author" content={post.profiles.username} />
+        
+        {/* Twitter */}
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:url" content={pageUrl} />
+        <meta name="twitter:title" content={pageTitle} />
+        <meta name="twitter:description" content={pageDescription} />
+        {pageImage && <meta name="twitter:image" content={pageImage} />}
+      </Helmet>
+      
       <Navbar />
 
       <main className="container mx-auto px-4 py-4 sm:py-8">
@@ -137,9 +168,10 @@ const PostView = () => {
               onTouchMove={onTouchMove}
               onTouchEnd={onTouchEnd}
             >
-              <img
+              <OptimizedImage
                 src={images[currentSlide]?.image_url}
                 alt={images[currentSlide]?.caption || "Post image"}
+                aspectRatio="square"
                 className="w-full h-full object-cover select-none"
                 draggable={false}
               />

@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
+import { Helmet } from "react-helmet-async";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { Navbar } from "@/components/layout/Navbar";
@@ -120,8 +121,32 @@ const Profile = () => {
       .slice(0, 2);
   };
 
+  const pageTitle = `${profile.display_name || profile.username} (@${profile.username}) - Zine`;
+  const pageDescription = profile.bio || `View ${profile.display_name || profile.username}'s posts and collections on Zine`;
+  const pageUrl = typeof window !== 'undefined' ? window.location.href : "";
+
   return (
     <div className="min-h-screen bg-background">
+      <Helmet>
+        <title>{pageTitle}</title>
+        <meta name="description" content={pageDescription} />
+        
+        {/* Open Graph */}
+        <meta property="og:type" content="profile" />
+        <meta property="og:url" content={pageUrl} />
+        <meta property="og:title" content={pageTitle} />
+        <meta property="og:description" content={pageDescription} />
+        {profile.avatar_url && <meta property="og:image" content={profile.avatar_url} />}
+        <meta property="profile:username" content={profile.username} />
+        
+        {/* Twitter */}
+        <meta name="twitter:card" content="summary" />
+        <meta name="twitter:url" content={pageUrl} />
+        <meta name="twitter:title" content={pageTitle} />
+        <meta name="twitter:description" content={pageDescription} />
+        {profile.avatar_url && <meta name="twitter:image" content={profile.avatar_url} />}
+      </Helmet>
+      
       <Navbar />
 
       <main className="container mx-auto px-4 py-4 sm:py-8">
