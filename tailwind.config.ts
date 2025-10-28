@@ -27,6 +27,17 @@ export default {
         ring: "hsl(var(--ring))",
         background: "hsl(var(--background))",
         foreground: "hsl(var(--foreground))",
+        brand: {
+          primary: "hsl(var(--brand-primary))",
+          accent: "hsl(var(--brand-accent))",
+          secondary: "hsl(var(--brand-secondary))",
+        },
+        bg: {
+          primary: "hsl(var(--bg-primary))",
+          secondary: "hsl(var(--bg-secondary))",
+          tertiary: "hsl(var(--bg-tertiary))",
+          elevated: "hsl(var(--bg-elevated))",
+        },
         primary: {
           DEFAULT: "hsl(var(--primary))",
           foreground: "hsl(var(--primary-foreground))",
@@ -46,6 +57,19 @@ export default {
         accent: {
           DEFAULT: "hsl(var(--accent))",
           foreground: "hsl(var(--accent-foreground))",
+          purple: "hsl(var(--accent-purple))",
+          teal: "hsl(var(--accent-teal))",
+          coral: "hsl(var(--accent-coral))",
+          amber: "hsl(var(--accent-amber))",
+        },
+        success: "hsl(var(--success))",
+        warning: "hsl(var(--warning))",
+        error: "hsl(var(--error))",
+        info: "hsl(var(--info))",
+        text: {
+          primary: "hsl(var(--text-primary))",
+          secondary: "hsl(var(--text-secondary))",
+          tertiary: "hsl(var(--text-tertiary))",
         },
         popover: {
           DEFAULT: "hsl(var(--popover))",
@@ -65,6 +89,29 @@ export default {
           border: "hsl(var(--sidebar-border))",
           ring: "hsl(var(--sidebar-ring))",
         },
+      },
+      fontFamily: {
+        primary: ['Inter', 'system-ui', 'sans-serif'],
+        secondary: ['Crimson Pro', 'Georgia', 'serif'],
+        mono: ['JetBrains Mono', 'Courier New', 'monospace'],
+      },
+      fontSize: {
+        '6xl': 'var(--text-6xl)',
+        '5xl': 'var(--text-5xl)',
+        '3xl': 'var(--text-3xl)',
+        'xl': 'var(--text-xl)',
+        'base': 'var(--text-base)',
+        'sm': 'var(--text-sm)',
+      },
+      lineHeight: {
+        'tight': 'var(--leading-tight)',
+        'normal': 'var(--leading-normal)',
+        'relaxed': 'var(--leading-relaxed)',
+      },
+      boxShadow: {
+        'sm': 'var(--shadow-sm)',
+        'md': 'var(--shadow-md)',
+        'lg': 'var(--shadow-lg)',
       },
       borderRadius: {
         lg: "var(--radius)",

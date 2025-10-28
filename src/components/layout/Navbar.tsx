@@ -10,6 +10,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
+import { ThemeToggle } from "@/components/ui/theme-toggle";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { useEffect, useState } from "react";
@@ -60,11 +61,11 @@ export const Navbar = () => {
   };
 
   return (
-    <header className="border-b border-border bg-background sticky top-0 z-50">
+    <header className="border-b border-border-light bg-bg-elevated sticky top-0 z-50 backdrop-blur-md bg-opacity-95 shadow-sm transition-colors duration-300">
       <div className="container mx-auto px-4 py-3 flex justify-between items-center">
         {/* Logo */}
         <h1
-          className="text-xl sm:text-2xl font-bold text-primary cursor-pointer"
+          className="text-xl sm:text-2xl font-bold font-primary text-brand-accent cursor-pointer"
           onClick={() => navigate(user ? "/feed" : "/")}
         >
           Zine
@@ -90,13 +91,13 @@ export const Navbar = () => {
                   <Button variant="ghost" size="icon" className="rounded-full h-11 w-11">
                     <Avatar className="h-8 w-8">
                       <AvatarImage src={profile?.avatar_url || undefined} />
-                      <AvatarFallback className="text-xs bg-primary text-primary-foreground">
+                      <AvatarFallback className="text-xs bg-brand-accent text-white">
                         {getInitials(profile?.display_name || profile?.username || user.email || "U")}
                       </AvatarFallback>
                     </Avatar>
                   </Button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-56">
+                <DropdownMenuContent align="end" className="w-56 bg-bg-elevated border-border-light z-50">
                   <DropdownMenuItem
                     onClick={() => {
                       if (profile?.username) {
@@ -115,12 +116,14 @@ export const Navbar = () => {
                     Settings
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
-                  <DropdownMenuItem onClick={handleLogout} className="text-destructive">
+                  <DropdownMenuItem onClick={handleLogout} className="text-error">
                     <LogOut className="mr-2 h-4 w-4" />
                     Log Out
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
+              
+              <ThemeToggle />
             </>
           ) : (
             <>
@@ -128,12 +131,15 @@ export const Navbar = () => {
                 Log In
               </Button>
               <Button onClick={() => navigate("/signup")}>Sign Up</Button>
+              <ThemeToggle />
             </>
           )}
         </nav>
 
         {/* Mobile Navigation */}
         <div className="flex md:hidden items-center gap-2">
+          <ThemeToggle />
+          
           {user && (
             <Button
               variant="ghost"
@@ -151,7 +157,7 @@ export const Navbar = () => {
                 <Menu className="h-6 w-6" />
               </Button>
             </SheetTrigger>
-            <SheetContent side="right" className="w-[280px]">
+            <SheetContent side="right" className="w-[280px] bg-bg-elevated border-border-light">
               <SheetHeader>
                 <SheetTitle>Menu</SheetTitle>
               </SheetHeader>
@@ -159,10 +165,10 @@ export const Navbar = () => {
                 {user ? (
                   <>
                     {/* Profile Card */}
-                    <div className="flex items-center gap-3 p-3 mb-4 border-b">
+                    <div className="flex items-center gap-3 p-3 mb-4 border-b border-border-light">
                       <Avatar className="h-12 w-12">
                         <AvatarImage src={profile?.avatar_url || undefined} />
-                        <AvatarFallback className="bg-primary text-primary-foreground">
+                        <AvatarFallback className="bg-brand-accent text-white">
                           {getInitials(profile?.display_name || profile?.username || user.email || "U")}
                         </AvatarFallback>
                       </Avatar>
@@ -224,10 +230,10 @@ export const Navbar = () => {
                       <Settings className="mr-3 h-5 w-5" />
                       Settings
                     </Button>
-                    <div className="my-2 border-t" />
+                    <div className="my-2 border-t border-border-light" />
                     <Button 
                       variant="ghost" 
-                      className="justify-start h-12 text-base text-destructive" 
+                      className="justify-start h-12 text-base text-error" 
                       onClick={handleLogout}
                     >
                       <LogOut className="mr-3 h-5 w-5" />
