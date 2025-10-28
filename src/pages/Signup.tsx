@@ -12,6 +12,7 @@ const Signup = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [username, setUsername] = useState("");
+  const [birthdate, setBirthdate] = useState("");
   const [loading, setLoading] = useState(false);
 
   const handleSignup = async (e: React.FormEvent) => {
@@ -19,6 +20,36 @@ const Signup = () => {
     setLoading(true);
 
     try {
+      // Validate password strength
+      if (password.length < 8) {
+        toast.error("Password must be at least 8 characters");
+        setLoading(false);
+        return;
+      }
+      if (!/[A-Z]/.test(password)) {
+        toast.error("Password must contain at least 1 uppercase letter");
+        setLoading(false);
+        return;
+      }
+      if (!/[0-9]/.test(password)) {
+        toast.error("Password must contain at least 1 number");
+        setLoading(false);
+        return;
+      }
+
+      // Validate age (13+ COPPA compliance)
+      if (!birthdate) {
+        toast.error("Birthdate is required");
+        setLoading(false);
+        return;
+      }
+      const age = new Date().getFullYear() - new Date(birthdate).getFullYear();
+      if (age < 13) {
+        toast.error("You must be at least 13 years old to create an account");
+        setLoading(false);
+        return;
+      }
+
       // Validate username format
       const usernameRegex = /^[a-z0-9_]{3,20}$/;
       if (!usernameRegex.test(username.toLowerCase())) {
@@ -62,6 +93,7 @@ const Signup = () => {
           emailRedirectTo: redirectUrl,
           data: {
             username: username.toLowerCase(),
+            birthdate: birthdate,
           },
         },
       });
@@ -114,6 +146,20 @@ const Signup = () => {
               />
             </div>
             <div className="space-y-2">
+              <Label htmlFor="birthdate">Birthdate</Label>
+              <Input
+                id="birthdate"
+                type="date"
+                value={birthdate}
+                onChange={(e) => setBirthdate(e.target.value)}
+                max={new Date().toISOString().split('T')[0]}
+                required
+              />
+              <p className="text-xs text-muted-foreground">
+                You must be 13 or older (COPPA compliance)
+              </p>
+            </div>
+            <div className="space-y-2">
               <Label htmlFor="password">Password</Label>
               <Input
                 id="password"
@@ -125,7 +171,7 @@ const Signup = () => {
                 required
               />
               <p className="text-xs text-muted-foreground">
-                Minimum 8 characters
+                Min 8 characters, 1 uppercase, 1 number
               </p>
             </div>
             <Button type="submit" className="w-full" disabled={loading}>

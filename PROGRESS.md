@@ -123,12 +123,15 @@ All tables created with Row Level Security (RLS) policies:
 - Loading states during auth checks
 
 #### Forms:
-- **Signup**: Username, email, password validation
-  - Checks reserved usernames
+- **Signup**: Username, email, password, birthdate validation
+  - **Password requirements**: Min 8 chars, 1 uppercase, 1 number
+  - **Age verification**: 13+ years (COPPA compliance)
+  - Checks reserved usernames (admin, zine, help, support, moderator, official, team, staff)
   - Checks username availability
   - Client-side validation (pattern matching)
-  - Creates profile automatically via trigger
+  - Creates profile automatically via trigger with birthdate
   - Email redirect URL configured
+  - Birthdate stored in user metadata and profiles table
 
 - **Login**: Email/password with error handling
   - Clear error messages
@@ -364,11 +367,13 @@ All tables created with Row Level Security (RLS) policies:
 
 ✅ **Row Level Security (RLS)**: All tables have policies
 ✅ **Email verification**: Enforced via Supabase Auth
-✅ **Reserved usernames**: Prevents squatting
-✅ **Username validation**: Format and length constraints
+✅ **Reserved usernames**: Prevents squatting on @admin, @zine, @help, @support, @moderator, @official, @team, @staff
+✅ **Username validation**: Format and length constraints (3-20 chars, lowercase, alphanumeric + underscores)
 ✅ **Self-follow prevention**: Database constraint
-✅ **Password requirements**: Min 8 characters
+✅ **Password requirements**: Min 8 chars, 1 uppercase, 1 number
+✅ **Age verification**: 13+ years (COPPA compliance)
 ✅ **Auth token management**: Auto-refresh handled by Supabase
+⚠️ **Leaked password protection**: Should be enabled in Supabase Auth settings (dashboard)
 
 ---
 
