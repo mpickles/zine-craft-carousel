@@ -81,7 +81,12 @@ export const ProfileCanvas = ({
                       onSelectBlock(block.id);
                     }}
                   >
-                    <BlockRenderer block={block} theme={theme} />
+                    <BlockRenderer 
+                      block={block} 
+                      theme={theme}
+                      userId={sections[0]?.user_id}
+                      isEditMode={true}
+                    />
                   </div>
                 ))
               )}

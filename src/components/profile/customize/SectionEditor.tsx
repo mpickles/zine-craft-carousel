@@ -72,11 +72,23 @@ export const SectionEditor = ({
           <Label className="text-xs text-muted-foreground mb-2 block">Add Block</Label>
           <Select
             onValueChange={(value) => {
-              const blockData = value === "text" 
-                ? { content: "<p>New text block</p>", alignment: "left" }
-                : value === "image"
-                ? { imageUrl: "", altText: "", size: "medium" }
-                : { links: [] };
+              let blockData = {};
+              
+              if (value === "text") {
+                blockData = { content: "<p>New text block</p>", alignment: "left" };
+              } else if (value === "image") {
+                blockData = { imageUrl: "", altText: "", size: "medium" };
+              } else if (value === "links") {
+                blockData = { links: [] };
+              } else if (value === "latest-posts") {
+                blockData = { count: 6, layout: "grid", showCaptions: true };
+              } else if (value === "featured-collection") {
+                blockData = { collectionId: "", postCount: 6, showName: true, showDescription: true };
+              } else if (value === "embed") {
+                blockData = { url: "", embedType: "youtube", width: "medium" };
+              } else if (value === "spacer") {
+                blockData = { height: 48 };
+              }
               
               onAddBlock({ block_type: value, block_data: blockData });
             }}
@@ -85,9 +97,13 @@ export const SectionEditor = ({
               <SelectValue placeholder="Choose block type..." />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="text">Text Block</SelectItem>
-              <SelectItem value="image">Image Block</SelectItem>
-              <SelectItem value="links">Links Block</SelectItem>
+              <SelectItem value="text">📝 Text Block</SelectItem>
+              <SelectItem value="image">🖼️ Image Block</SelectItem>
+              <SelectItem value="latest-posts">📮 Latest Posts</SelectItem>
+              <SelectItem value="featured-collection">📚 Featured Collection</SelectItem>
+              <SelectItem value="links">🔗 Links Block</SelectItem>
+              <SelectItem value="embed">🎬 Embed Block</SelectItem>
+              <SelectItem value="spacer">⬜ Spacer Block</SelectItem>
             </SelectContent>
           </Select>
         </div>

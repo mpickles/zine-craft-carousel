@@ -8,15 +8,20 @@ import { ProfileCanvas } from "@/components/profile/customize/ProfileCanvas";
 import { ProfileThemeSettings } from "@/components/profile/customize/ProfileThemeSettings";
 import { SectionEditor } from "@/components/profile/customize/SectionEditor";
 import { BlockEditor } from "@/components/profile/customize/BlockEditor";
-import { Eye, Save } from "lucide-react";
+import { ApplyTemplateModal } from "@/components/profile/customize/ApplyTemplateModal";
+import { Eye, Save, Palette } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { Skeleton } from "@/components/ui/skeleton";
+import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
+import type { TemplateConfig } from "@/lib/profileTemplates";
 
 const ProfileCustomize = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
   const [selectedSectionId, setSelectedSectionId] = useState<string | null>(null);
   const [selectedBlockId, setSelectedBlockId] = useState<string | null>(null);
+  const [templateModalOpen, setTemplateModalOpen] = useState(false);
 
   const {
     sections,
@@ -52,6 +57,60 @@ const ProfileCustomize = () => {
   const selectedSection = sections?.find((s) => s.id === selectedSectionId);
   const selectedBlock = blocks?.find((b) => b.id === selectedBlockId);
 
+  const handleApplyTemplate = async (template: TemplateConfig) => {
+    if (!user?.id) return;
+
+    try {
+      // Delete all non-header sections
+      const sectionsToDelete = sections?.filter((s) => !s.is_header) || [];
+      for (const section of sectionsToDelete) {
+        await supabase.from("profile_sections").delete().eq("id", section.id);
+      }
+
+      // Create new sections from template
+      const maxOrder = sections?.length || 0;
+      for (let i = 0; i < template.sections.length; i++) {
+        const sectionConfig = template.sections[i];
+        const { data: newSection, error: sectionError } = await supabase
+          .from("profile_sections")
+          .insert({
+            user_id: user.id,
+            section_order: maxOrder + i,
+            section_type: sectionConfig.section_type,
+            background_color: sectionConfig.background_color,
+            padding_size: sectionConfig.padding_size,
+          })
+          .select()
+          .single();
+
+        if (sectionError) throw sectionError;
+
+        // Create blocks for this section
+        for (let j = 0; j < sectionConfig.blocks.length; j++) {
+          const blockConfig = sectionConfig.blocks[j];
+          const { error: blockError } = await supabase
+            .from("profile_blocks")
+            .insert({
+              section_id: newSection.id,
+              block_order: j,
+              block_type: blockConfig.block_type,
+              block_data: blockConfig.block_data,
+              width: blockConfig.width,
+            });
+
+          if (blockError) throw blockError;
+        }
+      }
+
+      // Refresh data
+      window.location.reload();
+      toast.success("Template applied successfully! Customize it to make it yours.");
+    } catch (error) {
+      console.error("Error applying template:", error);
+      toast.error("Failed to apply template");
+    }
+  };
+
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
@@ -80,6 +139,14 @@ const ProfileCustomize = () => {
         {/* Left Sidebar */}
         <div className="w-80 border-r overflow-y-auto">
           <div className="p-6 space-y-6">
+            <Button
+              variant="outline"
+              className="w-full"
+              onClick={() => setTemplateModalOpen(true)}
+            >
+              <Palette className="w-4 h-4 mr-2" />
+              Apply Template
+            </Button>
             <ProfileSectionsList
               sections={sections || []}
               selectedSectionId={selectedSectionId}
@@ -136,6 +203,13 @@ const ProfileCustomize = () => {
           </div>
         )}
       </div>
+
+      {/* Apply Template Modal */}
+      <ApplyTemplateModal
+        open={templateModalOpen}
+        onOpenChange={setTemplateModalOpen}
+        onApplyTemplate={handleApplyTemplate}
+      />
     </div>
   );
 };

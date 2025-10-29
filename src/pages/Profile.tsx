@@ -11,7 +11,7 @@ import { Card } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "sonner";
-import { Settings, ExternalLink } from "lucide-react";
+import { Settings, ExternalLink, Edit } from "lucide-react";
 import { EditProfileDialog } from "@/components/profile/EditProfileDialog";
 import { FollowButton } from "@/components/profile/FollowButton";
 import { PostsGrid } from "@/components/profile/PostsGrid";
@@ -180,6 +180,20 @@ const Profile = () => {
       </Helmet>
       
       <Navbar />
+
+      {/* Edit Front Page Button - Fixed position for own profile */}
+      {isOwnProfile && (
+        <div className="fixed top-20 right-4 z-40">
+          <Button
+            onClick={() => navigate("/profile/customize")}
+            className="bg-accent text-white hover:bg-accent/90 shadow-lg"
+            size="lg"
+          >
+            <Edit className="w-4 h-4 mr-2" />
+            Edit Front Page
+          </Button>
+        </div>
+      )}
 
       <main className="container mx-auto px-4 py-4 sm:py-8">
         <div className="max-w-5xl mx-auto">
