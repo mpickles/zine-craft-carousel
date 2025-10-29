@@ -102,7 +102,7 @@ export default {
       },
       fontFamily: {
         primary: ['Inter', '-apple-system', 'BlinkMacSystemFont', 'sans-serif'],
-        display: ['Space Grotesk', '-apple-system', 'BlinkMacSystemFont', 'sans-serif'],
+        display: ['Playfair Display', 'Georgia', 'serif'],
         mono: ['JetBrains Mono', 'Courier New', 'monospace'],
       },
       fontSize: {

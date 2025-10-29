@@ -61,14 +61,14 @@ export const Navbar = () => {
   };
 
   return (
-    <header className="border-b border-border-light bg-bg-elevated sticky top-0 z-50 backdrop-blur-md bg-opacity-95 shadow-sm transition-colors duration-300">
-      <div className="container mx-auto px-4 py-3 flex justify-between items-center">
-        {/* Logo */}
+    <header className="border-b border-border-light bg-[rgba(255,248,240,0.95)] sticky top-0 z-50 backdrop-blur-md shadow-sm transition-colors duration-300">
+      <div className="container mx-auto px-4 py-4 flex justify-between items-center">
+        {/* Logo - ZINE Editorial Wordmark */}
         <h1
-          className="text-xl sm:text-2xl font-bold font-primary text-brand-accent cursor-pointer"
+          className="text-2xl sm:text-3xl font-display font-bold text-brand-primary cursor-pointer tracking-tight uppercase transition-colors hover:text-brand-accent"
           onClick={() => navigate(user ? "/feed" : "/")}
         >
-          Zine
+          ZINE
         </h1>
 
         {/* Desktop Navigation */}
