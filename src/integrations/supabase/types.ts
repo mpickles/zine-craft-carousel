@@ -437,6 +437,122 @@ export type Database = {
           },
         ]
       }
+      profile_blocks: {
+        Row: {
+          block_data: Json
+          block_order: number
+          block_type: string
+          created_at: string | null
+          id: string
+          section_id: string
+          updated_at: string | null
+          width: string | null
+        }
+        Insert: {
+          block_data?: Json
+          block_order: number
+          block_type: string
+          created_at?: string | null
+          id?: string
+          section_id: string
+          updated_at?: string | null
+          width?: string | null
+        }
+        Update: {
+          block_data?: Json
+          block_order?: number
+          block_type?: string
+          created_at?: string | null
+          id?: string
+          section_id?: string
+          updated_at?: string | null
+          width?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "profile_blocks_section_id_fkey"
+            columns: ["section_id"]
+            isOneToOne: false
+            referencedRelation: "profile_sections"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      profile_sections: {
+        Row: {
+          background_color: string | null
+          background_image_url: string | null
+          created_at: string | null
+          id: string
+          is_header: boolean | null
+          padding_size: string | null
+          section_order: number
+          section_type: string
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          background_color?: string | null
+          background_image_url?: string | null
+          created_at?: string | null
+          id?: string
+          is_header?: boolean | null
+          padding_size?: string | null
+          section_order: number
+          section_type?: string
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          background_color?: string | null
+          background_image_url?: string | null
+          created_at?: string | null
+          id?: string
+          is_header?: boolean | null
+          padding_size?: string | null
+          section_order?: number
+          section_type?: string
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      profile_themes: {
+        Row: {
+          color_accent: string | null
+          color_primary: string | null
+          color_secondary: string | null
+          created_at: string | null
+          font_body: string | null
+          font_heading: string | null
+          id: string
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          color_accent?: string | null
+          color_primary?: string | null
+          color_secondary?: string | null
+          created_at?: string | null
+          font_body?: string | null
+          font_heading?: string | null
+          id?: string
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          color_accent?: string | null
+          color_primary?: string | null
+          color_secondary?: string | null
+          created_at?: string | null
+          font_body?: string | null
+          font_heading?: string | null
+          id?: string
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           account_created_at: string | null

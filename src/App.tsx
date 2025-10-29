@@ -16,6 +16,7 @@ const Signup = lazy(() => import("./pages/Signup"));
 const Feed = lazy(() => import("./pages/Feed"));
 const Explore = lazy(() => import("./pages/Explore"));
 const Profile = lazy(() => import("./pages/Profile"));
+const ProfileCustomize = lazy(() => import("./pages/ProfileCustomize"));
 const Settings = lazy(() => import("./pages/Settings"));
 const CreatePost = lazy(() => import("./pages/CreatePost"));
 const PostView = lazy(() => import("./pages/PostView"));
@@ -74,6 +75,14 @@ const App = () => (
             />
             <Route path="/explore" element={<Explore />} />
             <Route path="/profile/:username" element={<Profile />} />
+            <Route
+              path="/profile/customize"
+              element={
+                <ProtectedRoute>
+                  <ProfileCustomize />
+                </ProtectedRoute>
+              }
+            />
             <Route
               path="/settings"
               element={
