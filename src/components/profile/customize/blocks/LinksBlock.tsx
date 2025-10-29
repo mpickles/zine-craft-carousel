@@ -1,4 +1,3 @@
-import { ProfileTheme } from "@/hooks/useProfileCustomization";
 import { Button } from "@/components/ui/button";
 import { ExternalLink } from "lucide-react";
 
@@ -10,10 +9,9 @@ interface LinksBlockProps {
       icon?: string;
     }>;
   };
-  theme?: ProfileTheme | null;
 }
 
-export const LinksBlock = ({ data, theme }: LinksBlockProps) => {
+export const LinksBlock = ({ data }: LinksBlockProps) => {
   if (!data.links || data.links.length === 0) {
     return (
       <div className="p-8 border border-dashed rounded text-center">

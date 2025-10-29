@@ -1,63 +1,68 @@
-import { Card } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { ExternalLink } from "lucide-react";
-import { FeaturedCollectionWidget } from "@/components/collections/FeaturedCollectionWidget";
+import { useEffect, useState } from "react";
+import { supabase } from "@/integrations/supabase/client";
+import { ProfileBlock } from "@/hooks/useProfileBlocks";
+import { BlockRenderer } from "./customize/blocks/BlockRenderer";
+import { Skeleton } from "@/components/ui/skeleton";
 
 interface FrontPageProps {
   userId: string;
-  template?: "minimal" | "magazine" | "portfolio";
-  bio?: string;
-  links?: Array<{ label: string; url: string }>;
-  featuredCollectionId?: string;
 }
 
-export const FrontPage = ({ 
-  userId, 
-  template = "minimal", 
-  bio, 
-  links,
-  featuredCollectionId
-}: FrontPageProps) => {
+export const FrontPage = ({ userId }: FrontPageProps) => {
+  const [blocks, setBlocks] = useState<ProfileBlock[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    loadBlocks();
+  }, [userId]);
+
+  const loadBlocks = async () => {
+    try {
+      const { data, error } = await supabase
+        .from("profile_blocks")
+        .select("*")
+        .eq("user_id", userId)
+        .order("block_order", { ascending: true });
+
+      if (error) throw error;
+      setBlocks(data as ProfileBlock[]);
+    } catch (error) {
+      console.error("Error loading blocks:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="space-y-6">
+        <Skeleton className="h-32 w-full" />
+        <Skeleton className="h-64 w-full" />
+      </div>
+    );
+  }
+
+  if (blocks.length === 0) {
+    return (
+      <div className="text-center py-20 border-2 border-dashed rounded-lg">
+        <p className="text-muted-foreground">
+          No content yet. Customize your front page to get started!
+        </p>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-6">
-      {/* Bio Section */}
-      {bio && (
-        <Card className="p-6">
-          <h2 className="text-xl font-semibold mb-4">About</h2>
-          <p className="whitespace-pre-wrap text-muted-foreground">{bio}</p>
-        </Card>
-      )}
-
-      {/* Featured Collection Widget */}
-      <FeaturedCollectionWidget 
-        userId={userId} 
-        collectionId={featuredCollectionId}
-      />
-
-      {/* Links */}
-      {links && links.length > 0 && (
-        <Card className="p-6">
-          <h2 className="text-xl font-semibold mb-4">Links</h2>
-          <div className="flex flex-wrap gap-2">
-            {links.map((link, idx) => (
-              <Button key={idx} variant="outline" size="sm" asChild>
-                <a href={link.url} target="_blank" rel="noopener noreferrer">
-                  <ExternalLink className="w-3 h-3 mr-1" />
-                  {link.label}
-                </a>
-              </Button>
-            ))}
-          </div>
-        </Card>
-      )}
-
-      {/* Latest Posts placeholder */}
-      <Card className="p-6">
-        <h2 className="text-xl font-semibold mb-4">Latest Posts</h2>
-        <p className="text-muted-foreground text-center py-8">
-          Recent posts will appear here
-        </p>
-      </Card>
+      {blocks.map((block) => (
+        <div key={block.id}>
+          <BlockRenderer
+            block={block}
+            userId={userId}
+            isEditMode={false}
+          />
+        </div>
+      ))}
     </div>
   );
 };

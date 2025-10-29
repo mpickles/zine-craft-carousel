@@ -289,10 +289,7 @@ const Profile = () => {
 
             {/* Front Page Tab */}
             <TabsContent value="front-page" className="mt-4 sm:mt-6">
-              <FrontPage
-                userId={profile.id}
-                bio={profile.bio || undefined}
-              />
+              <FrontPage userId={profile.id} />
             </TabsContent>
 
             {/* Posts Tab */}

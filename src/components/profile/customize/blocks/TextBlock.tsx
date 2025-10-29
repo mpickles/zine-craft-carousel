@@ -1,17 +1,14 @@
-import { ProfileTheme } from "@/hooks/useProfileCustomization";
-
 interface TextBlockProps {
   data: {
     content: string;
     alignment?: string;
     textColor?: string;
   };
-  theme?: ProfileTheme | null;
 }
 
-export const TextBlock = ({ data, theme }: TextBlockProps) => {
+export const TextBlock = ({ data }: TextBlockProps) => {
   const textAlign = data.alignment || "left";
-  const color = data.textColor || theme?.color_primary || "#000000";
+  const color = data.textColor || "#000000";
 
   return (
     <div
