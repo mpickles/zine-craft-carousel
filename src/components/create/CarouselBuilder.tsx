@@ -1,5 +1,5 @@
 import { useRef } from 'react';
-import { X, ChevronRight, Edit, MessageSquare, Plus } from 'lucide-react';
+import { X, ChevronRight, Edit, MessageSquare, Plus, Type } from 'lucide-react';
 import {
   DndContext,
   closestCenter,
@@ -19,6 +19,7 @@ import { Button } from '@/components/ui/button';
 import { SlideThumbnail } from './SlideThumbnail';
 import { ImageEditModal } from './ImageEditModal';
 import { CaptionModal } from './CaptionModal';
+import { AdvancedTextEditor } from './AdvancedTextEditor';
 import type { Slide, ImageEdits } from '@/types/post';
 import { MAX_SLIDES, MAX_FILE_SIZE, ALLOWED_IMAGE_TYPES, DEFAULT_IMAGE_EDITS } from '@/types/post';
 import { useToast } from '@/hooks/use-toast';
@@ -32,8 +33,10 @@ interface CarouselBuilderProps {
   onCancel: () => void;
   editModalOpen: boolean;
   captionModalOpen: boolean;
+  textEditorOpen: boolean;
   setEditModalOpen: (open: boolean) => void;
   setCaptionModalOpen: (open: boolean) => void;
+  setTextEditorOpen: (open: boolean) => void;
 }
 
 export const CarouselBuilder = ({
@@ -45,8 +48,10 @@ export const CarouselBuilder = ({
   onCancel,
   editModalOpen,
   captionModalOpen,
+  textEditorOpen,
   setEditModalOpen,
   setCaptionModalOpen,
+  setTextEditorOpen,
 }: CarouselBuilderProps) => {
   const { toast } = useToast();
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -196,6 +201,30 @@ export const CarouselBuilder = ({
     onSlidesChange(updatedSlides);
   };
 
+  const handleTextOverlaySave = (dataUrl: string) => {
+    // Convert data URL to blob
+    fetch(dataUrl)
+      .then(res => res.blob())
+      .then(blob => {
+        // Create a new File object from the blob
+        const file = new File([blob], `text-overlay-${Date.now()}.png`, { type: 'image/png' });
+        const url = URL.createObjectURL(blob);
+        
+        // Update the slide with the new image
+        const updatedSlides = slides.map((slide, idx) =>
+          idx === currentSlideIndex 
+            ? { ...slide, imageFile: file, imageUrl: url }
+            : slide
+        );
+        onSlidesChange(updatedSlides);
+        
+        toast({
+          title: 'Text added',
+          description: 'Your text overlay has been applied',
+        });
+      });
+  };
+
   return (
     <div className="flex flex-col h-screen bg-bg-primary">
       {/* Header - Fixed at top */}
@@ -267,20 +296,30 @@ export const CarouselBuilder = ({
                   size="default"
                   onClick={() => setEditModalOpen(true)}
                   disabled={!currentSlide}
-                  className="min-w-[140px] h-11"
+                  className="min-w-[120px] h-11"
                 >
                   <Edit className="w-4 h-4 mr-2" />
-                  Edit Image
+                  Edit
+                </Button>
+                <Button
+                  variant="outline"
+                  size="default"
+                  onClick={() => setTextEditorOpen(true)}
+                  disabled={!currentSlide}
+                  className="min-w-[120px] h-11"
+                >
+                  <Type className="w-4 h-4 mr-2" />
+                  Add Text
                 </Button>
                 <Button
                   variant="outline"
                   size="default"
                   onClick={() => setCaptionModalOpen(true)}
                   disabled={!currentSlide}
-                  className="min-w-[140px] h-11"
+                  className="min-w-[120px] h-11"
                 >
                   <MessageSquare className="w-4 h-4 mr-2" />
-                  Add Caption
+                  Caption
                 </Button>
               </div>
             </div>
@@ -356,6 +395,13 @@ export const CarouselBuilder = ({
             initialEdits={currentSlide.edits}
             slideCount={slides.length}
           />
+          {textEditorOpen && (
+            <AdvancedTextEditor
+              imageUrl={currentSlide.imageUrl}
+              onSave={handleTextOverlaySave}
+              onClose={() => setTextEditorOpen(false)}
+            />
+          )}
           <CaptionModal
             isOpen={captionModalOpen}
             onClose={() => setCaptionModalOpen(false)}

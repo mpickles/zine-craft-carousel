@@ -35,6 +35,7 @@ export const CreatePost = () => {
   // Modal state
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [captionModalOpen, setCaptionModalOpen] = useState(false);
+  const [textEditorOpen, setTextEditorOpen] = useState(false);
   const [cancelDialogOpen, setCancelDialogOpen] = useState(false);
 
   // LocalStorage for draft persistence
@@ -227,8 +228,10 @@ export const CreatePost = () => {
           onCancel={handleCancel}
           editModalOpen={editModalOpen}
           captionModalOpen={captionModalOpen}
+          textEditorOpen={textEditorOpen}
           setEditModalOpen={setEditModalOpen}
           setCaptionModalOpen={setCaptionModalOpen}
+          setTextEditorOpen={setTextEditorOpen}
         />
       ) : (
         <PublishPage
